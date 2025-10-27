@@ -2,15 +2,62 @@
     import java.util.Date;
     import java.util.List;
     import java.util.UUID;
-    // (Importa las clases que vayas necesitando)
+    import java.util.Scanner;
 
-    import TPO_POO.Alquilador.Cancha;
-    import TPO_POO.Alquilador.Comprobante;
-    import TPO_POO.Alquilador.Empleado;
-    import TPO_POO.Alquilador.Mantenimiento;
-    import TPO_POO.Alquilador.Partido;
-    import TPO_POO.Alquilador.Reserva;
-    import TPO_POO.Alquilador.Ticket;
+    // --- Clase Main para correr el sistema ---
+ public class Main {
+
+    public static void main(String[] args) {
+        
+        // --- 1. SETUP DEL MODELO ---
+        Sistema miSistema = new Sistema();
+        
+        // (Creamos datos de prueba para que el sistema no esté vacío)
+        // Asumimos que los constructores de Cancha/Alquilador no piden ID
+        // Se puede cambiar a que el alquilador se ingrese por consola.
+        // Mas adelante sera reemplazado por una interfaz gráfica. Swing.
+        Alquilador alquilador = new Alquilador("Juan", "Perez", "123");
+        Cancha cancha = new Cancha("Cancha 5", "F5", 5000); 
+        miSistema.registrarAlquilador(alquilador);
+        miSistema.registrarCancha(cancha);
+        
+        try {
+            // Creamos una reserva (que tendrá el ID 1)
+            miSistema.crearReserva(alquilador, cancha, new Date(), "20:00");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        
+        // --- 2. SETUP DE LA VISTA (CONSOLA) ---
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("=== BIENVENIDO AL SISTEMA DE RESERVAS ===");
+        System.out.println("Hay 1 reserva activa (ID 1)");
+        System.out.print("Ingrese el ID de la reserva a CANCELAR: ");
+        
+        try {
+            // 3. VISTA: Lee el input del usuario
+            int idParaCancelar = scanner.nextInt();
+
+            // 4. CONTROLADOR: Llama al MODELO
+            // ¡Observa que llamas al método PÚBLICO, no a 'buscarReservaPorId'!
+            miSistema.cancelarReserva(idParaCancelar);
+            
+            // 5. VISTA: Informa el éxito
+            System.out.println("ÉXITO: La reserva " + idParaCancelar + " fue cancelada.");
+
+        } catch (java.util.InputMismatchException e) {
+            // Error si el usuario escribió "hola"
+            System.err.println("Error: Debe ingresar un número entero.");
+        } catch (IllegalStateException e) {
+            // Error si el SISTEMA no encontró el ID (la excepción de 'buscarReservaPorId')
+            System.err.println("ERROR: " + e.getMessage());
+        }
+        
+        scanner.close();
+    }
+}
 
     // --- CLASES DE PERSONAS REFACTORIZADAS ---
     public class Sistema {
@@ -35,8 +82,17 @@
             this.listaTickets = new ArrayList<>();
             this.listaMantenimientos = new ArrayList<>();
         }
+        Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0); // ID será 1
+        Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);   // ID será 2
+        Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);   // ID será 3
+        Cancha c4 = new Cancha("Cancha 4 (F5)", "F5", 5000.0);   // ID será 4
 
-        // --- Métodos de Registro (ABM) ---
+        // Registro en la lista maestra
+        this.listaCanchas.add(c1);
+        this.listaCanchas.add(c2);
+        this.listaCanchas.add(c3);
+        this.listaCanchas.add(c4);
+
         public void registrarCancha(Cancha cancha) {
             this.listaCanchas.add(cancha);
         }
@@ -53,8 +109,16 @@
             this.listaAudiencia.add(audiencia);
         }
 
-        // --- Métodos de Funcionalidad Principal (El Esqueleto) ---
-        
+        // Recorre la lista de reservas y devuelve la que coincide con el idReserva, si no coincide lanza excepción.
+        private Reserva buscarReservaPorId(int idReserva) {
+            for (Reserva res : listaReservas) {
+                if (res.getIdReserva() == idReserva) {
+                    return res;
+                }
+            }
+            throw new IllegalStateException("Error al buscar la reserva: Reserva no encontrada.");                      
+        }
+
         public List<Cancha> buscarDisponibilidad(Date fecha, String hora, String tipoCancha) {
             // Lógica para buscar canchas...
             return new ArrayList<>(); // Devuelve lista vacía por ahora
@@ -161,7 +225,7 @@
         public Alquilador(String nombre, String apellido, String dni) {
             super(nombre, apellido, dni);
         }
-
+    }
         
 
     class Empleado extends Persona {
@@ -193,6 +257,7 @@
         }
     }
 
+
     class Encargado extends Empleado {
         public Encargado(String nombre, String apellido, String dni) {
             super(nombre, apellido, dni, "Encargado"); // Rol fijo
@@ -205,27 +270,45 @@
 
     // --- CLASES DEL DOMINIO ---
 
-    class Cancha {
-        private int idCancha;
-        private String nombre;
-        private String tipo;
-        private double precioHora;
-        private String estado; // "Disponible", "Mantenimiento"
+    
+class Cancha {
+    // 1. AÑADIR CONTADOR ESTÁTICO
+    private static int proximoId = 1;
 
-        public Cancha(int idCancha, String nombre, String tipo, double precioHora) {
-            this.idCancha = idCancha;
-            this.nombre = nombre;
-            this.tipo = tipo;
-            this.precioHora = precioHora;
-            this.estado = "Disponible";
-        }
+    private int idCancha;
+    private String nombre;
+    private String tipo; // "F11", "F9", "F5"
+    private double precioHora;
+    private String estado; 
+
+    // 2. QUITAR EL ID DEL CONSTRUCTOR
+    public Cancha(String nombre, String tipo, double precioHora) {
         
-        public double getPrecioHora() { return precioHora; }
-        public String getEstado() { return estado; }
-        public void setEstado(String estado) { this.estado = estado; }
+        // 3. ASIGNAR EL ID AUTOMÁTICAMENTE
+        this.idCancha = proximoId++; 
         
-        // (Faltan los otros getters)
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.precioHora = precioHora;
+        this.estado = "Disponible";
     }
+        // Getters y Setters
+    public int getIdCancha() { 
+        return idCancha;
+    }
+    
+    public String getNombre() { 
+        return nombre;
+    }
+
+    public String getTipo() { 
+        return tipo;
+    }
+
+    public double getPrecioHora() { return precioHora; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+}
 
     class Reserva {
         private int idReserva;
@@ -239,7 +322,7 @@
 
         public Reserva(Date fecha, String hora, Alquilador alquilador, Cancha cancha) {
             this.idReserva = proximoId++;
-            proximoId++;    // Incrementa el ID para la próxima reserva, se reinicia cuando se abre el programa
+            // Incrementa el ID para la próxima reserva, se reinicia cuando se abre el programa
             // pero por lo menos los IDs son únicos durante la ejecución y son simples y legibles.
             this.fecha = fecha;
             this.hora = hora;
