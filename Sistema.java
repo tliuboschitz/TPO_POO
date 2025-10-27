@@ -12,14 +12,11 @@
         // --- 1. SETUP DEL MODELO ---
         Sistema miSistema = new Sistema();
         
-        // (Creamos datos de prueba para que el sistema no esté vacío)
-        // Asumimos que los constructores de Cancha/Alquilador no piden ID
+        // datos de prueba para que el sistema no esté vacío
         // Se puede cambiar a que el alquilador se ingrese por consola.
         // Mas adelante sera reemplazado por una interfaz gráfica. Swing.
         Alquilador alquilador = new Alquilador("Juan", "Perez", "123");
-        Cancha cancha = new Cancha("Cancha 5", "F5", 5000); 
         miSistema.registrarAlquilador(alquilador);
-        miSistema.registrarCancha(cancha);
         
         try {
             // Creamos una reserva (que tendrá el ID 1)
@@ -37,21 +34,15 @@
         System.out.print("Ingrese el ID de la reserva a CANCELAR: ");
         
         try {
-            // 3. VISTA: Lee el input del usuario
             int idParaCancelar = scanner.nextInt();
 
-            // 4. CONTROLADOR: Llama al MODELO
-            // ¡Observa que llamas al método PÚBLICO, no a 'buscarReservaPorId'!
             miSistema.cancelarReserva(idParaCancelar);
             
-            // 5. VISTA: Informa el éxito
             System.out.println("ÉXITO: La reserva " + idParaCancelar + " fue cancelada.");
 
         } catch (java.util.InputMismatchException e) {
-            // Error si el usuario escribió "hola"
             System.err.println("Error: Debe ingresar un número entero.");
         } catch (IllegalStateException e) {
-            // Error si el SISTEMA no encontró el ID (la excepción de 'buscarReservaPorId')
             System.err.println("ERROR: " + e.getMessage());
         }
         
@@ -65,11 +56,11 @@
         private List<Cancha> listaCanchas;
         private List<Reserva> listaReservas;
         private List<Empleado> listaEmpleados;
-        private List<Alquilador> listaAlquiladores; // <-- CAMBIO
-        private List<Audiencia> listaAudiencia;    // <-- NUEVO
+        private List<Alquilador> listaAlquiladores; 
+        private List<Audiencia> listaAudiencia;   
         private List<Partido> listaPartidos;
         private List<Ticket> listaTickets;
-        private List<Mantenimiento> listaMantenimientos; // <-- NUEVO
+        private List<Mantenimiento> listaMantenimientos; 
 
         // --- Constructor ---
         public Sistema() {
@@ -81,7 +72,7 @@
             this.listaPartidos = new ArrayList<>();
             this.listaTickets = new ArrayList<>();
             this.listaMantenimientos = new ArrayList<>();
-        }
+        
         Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0); // ID será 1
         Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);   // ID será 2
         Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);   // ID será 3
@@ -92,7 +83,7 @@
         this.listaCanchas.add(c2);
         this.listaCanchas.add(c3);
         this.listaCanchas.add(c4);
-
+        }
         public void registrarCancha(Cancha cancha) {
             this.listaCanchas.add(cancha);
         }
@@ -126,16 +117,13 @@
 
         public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) {
 
-        if (!this.estaDisponible(cancha, fecha, hora)) {
+        if (!this.estaDisponible(cancha, fecha, hora)) {  
             
-            // LANZAS UNA EXCEPCIÓN "UNCHECKED"
             throw new IllegalStateException("Error al crear la reserva: La cancha " + 
                                     cancha.getNombre() + " ya está ocupada en ese horario.");
         }
 
-        
-        int nuevoId = this.listaReservas.size() + 1; 
-        Reserva nuevaReserva = new Reserva(nuevoId, fecha, hora, alquilador, cancha);
+        Reserva nuevaReserva = new Reserva(fecha, hora, alquilador, cancha);
         this.listaReservas.add(nuevaReserva);
         return nuevaReserva;
     }
@@ -272,7 +260,7 @@
 
     
 class Cancha {
-    // 1. AÑADIR CONTADOR ESTÁTICO
+    // CONTADOR ESTÁTICO
     private static int proximoId = 1;
 
     private int idCancha;
@@ -281,10 +269,10 @@ class Cancha {
     private double precioHora;
     private String estado; 
 
-    // 2. QUITAR EL ID DEL CONSTRUCTOR
+    
     public Cancha(String nombre, String tipo, double precioHora) {
         
-        // 3. ASIGNAR EL ID AUTOMÁTICAMENTE
+        
         this.idCancha = proximoId++; 
         
         this.nombre = nombre;
