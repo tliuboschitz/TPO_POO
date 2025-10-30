@@ -1,3 +1,8 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+
  class Ticket {
         private int idTicket;
         private Partido partido;

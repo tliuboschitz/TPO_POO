@@ -1,3 +1,9 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+
 class Empleado extends Persona {
         private String rol;
         private UUID iUuid;
@@ -25,6 +31,5 @@ class Empleado extends Persona {
         public void gestionarPartido(Partido partido) {
             // Lógica para gestionar un partido...
         }
-    }public class Empleado {
 
-}
+    }

@@ -1,3 +1,9 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+
 class Reserva {
         private int idReserva;
         private static int proximoId = 1;
@@ -8,11 +14,11 @@ class Reserva {
         private double monto;
         private String estado; // "Pendiente", "Confirmada", "Cancelada"
 
-        public Reserva(Date fecha, String hora, Alquilador alquilador, Cancha cancha) {
+        public Reserva(java.util.Date fecha2, String hora, Alquilador alquilador, Cancha cancha) {
             this.idReserva = proximoId++;
             // Incrementa el ID para la próxima reserva, se reinicia cuando se abre el programa
             // pero por lo menos los IDs son únicos durante la ejecución y son simples y legibles.
-            this.fecha = fecha;
+            this.fecha = fecha2;
             this.hora = hora;
             this.alquilador = alquilador;
             this.cancha = cancha;
