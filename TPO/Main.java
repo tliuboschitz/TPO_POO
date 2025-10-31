@@ -1,8 +1,10 @@
-    import java.util.ArrayList;
+package TPO;
+import java.util.ArrayList;
     import java.util.Date;
     import java.util.List;
     import java.util.UUID;
     import java.util.Scanner;
+
 
     // --- Clase Main para correr el sistema ---
  public class Main {
@@ -14,10 +16,12 @@
         
         // datos de prueba para que el sistema no esté vacío
         // Se puede cambiar a que el alquilador se ingrese por consola.
-        // Mas adelante sera reemplazado por una interfaz gráfica. Swing.
+        // Mas adelante sera reemplazado por una interfaz gráfica.
         Alquilador alquilador = new Alquilador("Juan", "Perez", "123");
         miSistema.registrarAlquilador(alquilador);
         
+        Cancha cancha = miSistema.buscarCanchaPorId(3);
+
         try {
             // Creamos una reserva (que tendrá el ID 1)
             miSistema.crearReserva(alquilador, cancha, new Date(), "20:00");

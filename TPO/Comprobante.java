@@ -1,8 +1,9 @@
+package TPO;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
- 
+
  class Comprobante {
         private int idComprobante;
         private Reserva reserva;

@@ -1,10 +1,10 @@
+package TPO;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-
-class Reserva {
+public class Reserva {
         private int idReserva;
         private static int proximoId = 1;
         private Date fecha;

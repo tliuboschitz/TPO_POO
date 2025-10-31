@@ -1,4 +1,4 @@
-
+package TPO;
     class Encargado extends Empleado {
         public Encargado(String nombre, String apellido, String dni) {
             super(nombre, apellido, dni, "Encargado"); // Rol fijo

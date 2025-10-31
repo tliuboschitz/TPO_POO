@@ -1,4 +1,5 @@
-class Cancha {
+package TPO;
+public class Cancha {
     // CONTADOR ESTÁTICO
     private static int proximoId = 1;
 

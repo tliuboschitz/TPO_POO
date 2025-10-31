@@ -1,3 +1,4 @@
+package TPO;
 class Audiencia extends Persona {
         private String email;
         private int edad;      

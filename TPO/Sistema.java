@@ -1,6 +1,9 @@
+package TPO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Date;
+
 
 
 // --- CLASES DE PERSONAS REFACTORIZADAS ---
@@ -63,11 +66,21 @@ import java.util.UUID;
             throw new IllegalStateException("Error al buscar la reserva: Reserva no encontrada.");                      
         }
 
+        // Recorre la lista de canchas y devuelve la que coincide con el idCancha
+public Cancha buscarCanchaPorId(int idCancha) {
+    for (Cancha c : listaCanchas) {
+        if (c.getIdCancha() == idCancha) {
+            return c;
+        }
+    }
+    throw new IllegalStateException("Error: No se encontró ninguna cancha con el ID " + idCancha);
+}
+
         public List<Cancha> buscarDisponibilidad(Date fecha, String hora, String tipoCancha) {
             // Lógica para buscar canchas...
             return new ArrayList<>(); // Devuelve lista vacía por ahora
         }
-
+        
         public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) {
 
         if (!this.estaDisponible(cancha, fecha, hora)) {  
@@ -107,5 +120,4 @@ import java.util.UUID;
             return true; // Placeholder
         }
 
-        // ... otros métodos ...
     }

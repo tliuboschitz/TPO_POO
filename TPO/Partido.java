@@ -1,4 +1,5 @@
- class Partido {
+package TPO;
+public class Partido {
         private int idPartido;
         private Reserva reserva; // El partido "usa" una reserva
         private String equipos;

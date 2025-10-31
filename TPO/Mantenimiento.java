@@ -1,4 +1,6 @@
-    class Mantenimiento {
+package TPO;
+
+class Mantenimiento {
         private int idMantenimiento;
         private String descripcion;
         private Cancha canchaAfectada;
