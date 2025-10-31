@@ -1,24 +1,27 @@
-class Audiencia extends Persona {
-        private String email;
-        private int edad;      
-        private boolean esSocio; 
-        private String tutorNombre; 
-        public Audiencia(String nombre, String apellido, String dni, String email, int edad, boolean esSocio, String tutor) {
-            super(nombre, apellido, dni);
-            this.email = email;
-            this.edad = edad;
-            this.esSocio = esSocio;
-            this.tutorNombre = (edad < 18) ? tutor : null; // Asigna tutor solo si es menor
-        }
+/**
+ * Audiencia: espectador que puede comprar tickets
+ * Tiene email, edad, si es socio y tutor si menor
+ */
+public class Audiencia extends Persona {
+    private String email;
+    private int edad;
+    private boolean esSocio;
+    private String tutorNombre;
 
-        // Getters
-        public String getEmail() { return email; }
-        public int getEdad() { return edad; }
-        public boolean isEsSocio() { return esSocio; } // "is" es la convención para boolean
-        
-        // NOTA: Eliminé getDireccion() y getTelefono() porque no tenías esos atributos.
-
-        public void comprarTicket(Partido partido) {
-            // Lógica para comprar un ticket...
-        }
+    public Audiencia(String nombre, String apellido, String dni, String email, int edad, boolean esSocio, String tutor) {
+        super(nombre, apellido, dni);
+        this.email = email;
+        this.edad = edad;
+        this.esSocio = esSocio;
+        this.tutorNombre = (edad < 18) ? tutor : null;
     }
+
+    public String getEmail() { return email; }
+    public int getEdad() { return edad; }
+    public boolean isSocio() { return esSocio; }
+
+    @Override
+    public String toString() {
+        return super.toString() + " - Edad: " + edad + (esSocio ? " (Socio)" : "");
+    }
+}

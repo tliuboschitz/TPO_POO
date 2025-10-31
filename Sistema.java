@@ -1,111 +1,118 @@
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
+/**
+ * Sistema: controlador central del TP.
+ * Contiene listas maestras y la lógica de negocio principal.
+ */
+public class Sistema {
 
-// --- CLASES DE PERSONAS REFACTORIZADAS ---
-    public class Sistema {
-        // --- Listas Maestras ---
-        private List<Cancha> listaCanchas;
-        private List<Reserva> listaReservas;
-        private List<Empleado> listaEmpleados;
-        private List<Alquilador> listaAlquiladores; 
-        private List<Audiencia> listaAudiencia;   
-        private List<Partido> listaPartidos;
-        private List<Ticket> listaTickets;
-        private List<Mantenimiento> listaMantenimientos; 
+    private List<Cancha> listaCanchas;
+    private List<Reserva> listaReservas;
+    private List<Empleado> listaEmpleados;
+    private List<Alquilador> listaAlquiladores;
+    private List<Audiencia> listaAudiencias;
+    private List<Partido> listaPartidos;
+    private List<Ticket> listaTickets;
+    private List<Mantenimiento> listaMantenimientos;
 
-        // --- Constructor ---
-        public Sistema() {
-            this.listaCanchas = new ArrayList<>();
-            this.listaReservas = new ArrayList<>();
-            this.listaEmpleados = new ArrayList<>();
-            this.listaAlquiladores = new ArrayList<>();
-            this.listaAudiencia = new ArrayList<>();
-            this.listaPartidos = new ArrayList<>();
-            this.listaTickets = new ArrayList<>();
-            this.listaMantenimientos = new ArrayList<>();
-        
-        Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0); // ID será 1
-        Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);   // ID será 2
-        Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);   // ID será 3
-        Cancha c4 = new Cancha("Cancha 4 (F5)", "F5", 5000.0);   // ID será 4
+    private int proximoIdPartido = 1; // id secuencial para partidos
 
-        // Registro en la lista maestra
-        this.listaCanchas.add(c1);
-        this.listaCanchas.add(c2);
-        this.listaCanchas.add(c3);
-        this.listaCanchas.add(c4);
-        }
-        public void registrarCancha(Cancha cancha) {
-            this.listaCanchas.add(cancha);
-        }
-        
-        public void registrarEmpleado(Empleado empleado) {
-            this.listaEmpleados.add(empleado);
-        }
-        
-        public void registrarAlquilador(Alquilador alquilador) {
-            this.listaAlquiladores.add(alquilador);
-        }
-        
-        public void registrarAudiencia(Audiencia audiencia) {
-            this.listaAudiencia.add(audiencia);
-        }
+    public Sistema() {
+        this.listaCanchas = new ArrayList<>();
+        this.listaReservas = new ArrayList<>();
+        this.listaEmpleados = new ArrayList<>();
+        this.listaAlquiladores = new ArrayList<>();
+        this.listaAudiencias = new ArrayList<>();
+        this.listaPartidos = new ArrayList<>();
+        this.listaTickets = new ArrayList<>();
+        this.listaMantenimientos = new ArrayList<>();
 
-        // Recorre la lista de reservas y devuelve la que coincide con el idReserva, si no coincide lanza excepción.
-        private Reserva buscarReservaPorId(int idReserva) {
-            for (Reserva res : listaReservas) {
-                if (res.getIdReserva() == idReserva) {
-                    return res;
-                }
+        // Carga inicial de canchas de ejemplo
+        listaCanchas.add(new Cancha("Cancha 1 (F11)", "F11", 10000.0));
+        listaCanchas.add(new Cancha("Cancha 2 (F9)", "F9", 8000.0));
+        listaCanchas.add(new Cancha("Cancha 3 (F5)", "F5", 5000.0));
+    }
+
+    // --- REGISTROS ---
+    public void registrarCancha(Cancha c) { if (c!=null) listaCanchas.add(c); }
+    public void registrarEmpleado(Empleado e) { if (e!=null) listaEmpleados.add(e); }
+    public void registrarAlquilador(Alquilador a) { if (a!=null) listaAlquiladores.add(a); }
+    public void registrarAudiencia(Audiencia a) { if (a!=null) listaAudiencias.add(a); }
+
+    // --- RESERVAS ---
+    public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) {
+        if (alquilador == null) throw new IllegalArgumentException("Alquilador nulo.");
+        if (cancha == null) throw new IllegalArgumentException("Cancha nula.");
+        if (!estaDisponible(cancha, fecha, hora)) throw new IllegalStateException("Cancha ocupada en ese horario.");
+        Reserva r = new Reserva(fecha, hora, alquilador, cancha);
+        listaReservas.add(r);
+        return r;
+    }
+
+    public void cancelarReserva(int idReserva) {
+        Reserva r = buscarReservaPorId(idReserva);
+        if (r.getEstado().equals("Cancelada")) throw new IllegalStateException("Reserva ya cancelada.");
+        r.cancelar();
+    }
+
+    public Comprobante confirmarReserva(int idReserva) {
+        Reserva r = buscarReservaPorId(idReserva);
+        if (r.getEstado().equals("Confirmada")) throw new IllegalStateException("Reserva ya confirmada.");
+        r.confirmar();
+        Comprobante c = r.generarComprobante();
+        return c;
+    }
+
+    // Busca reserva por id, lanza excepción si no existe
+    public Reserva buscarReservaPorId(int id) {
+        for (Reserva r : listaReservas) if (r.getIdReserva() == id) return r;
+        throw new IllegalStateException("Reserva no encontrada (id=" + id + ").");
+    }
+
+    // Chequea disponibilidad simple (por cancha+fecha+hora)
+    public boolean estaDisponible(Cancha cancha, Date fecha, String hora) {
+        for (Reserva r : listaReservas) {
+            if (r.getCancha() == cancha && r.getFecha().equals(fecha) && r.getHora().equals(hora) &&
+                    !r.getEstado().equals("Cancelada")) {
+                return false;
             }
-            throw new IllegalStateException("Error al buscar la reserva: Reserva no encontrada.");                      
         }
-
-        public List<Cancha> buscarDisponibilidad(Date fecha, String hora, String tipoCancha) {
-            // Lógica para buscar canchas...
-            return new ArrayList<>(); // Devuelve lista vacía por ahora
-        }
-
-        public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) {
-
-        if (!this.estaDisponible(cancha, fecha, hora)) {  
-            
-            throw new IllegalStateException("Error al crear la reserva: La cancha " + 
-                                    cancha.getNombre() + " ya está ocupada en ese horario.");
-        }
-
-        Reserva nuevaReserva = new Reserva(fecha, hora, alquilador, cancha);
-        this.listaReservas.add(nuevaReserva);
-        return nuevaReserva;
+        return true;
     }
-        
-        public void cancelarReserva(int idReserva) {
-            // Lógica para buscar la reserva y setear estado "Cancelada"
-        }
-        
-        public Comprobante confirmarReserva(int idReserva) {
-            // Lógica para buscar reserva, setear estado "Confirmada"
-            // y generar un Comprobante.
-            return null; // Placeholder
-        }
-        
-        public Partido crearPartido(Reserva reserva, String equipos, double precioTicket) {
-            // Lógica para crear el partido...
-            return null; // Placeholder
-        }
-        
-        public Ticket venderTicket(Partido partido, Audiencia audiencia) {
-            // Lógica para calcular precio (descuentos, etc) y crear Ticket
-            return null; // Placeholder
-        }
 
-        // Método de soporte (Regla de Negocio)
-        private boolean estaDisponible(Cancha cancha, Date fecha, String hora) {
-            // Lógica de chequeo que vimos...
-            return true; // Placeholder
-        }
-
-        // ... otros métodos ...
+    // --- PARTIDOS ---
+    public Partido crearPartido(Reserva reserva, String equipos, double precioTicketBase) {
+        if (reserva == null) throw new IllegalArgumentException("Reserva nula.");
+        // confirmar automáticamente la reserva si está pendiente
+        if (reserva.getEstado().equals("Pendiente")) reserva.confirmar();
+        Partido p = new Partido(proximoIdPartido++, reserva, equipos, precioTicketBase);
+        listaPartidos.add(p);
+        return p;
     }
+
+    public List<Partido> getListaPartidos() { return new ArrayList<>(listaPartidos); }
+
+    // --- TICKETS ---
+    public Ticket venderTicket(Partido partido, Audiencia comprador) {
+        if (partido == null || comprador == null) throw new IllegalArgumentException("Partido o comprador nulo.");
+        double precio = partido.getPrecioTicketBase();
+        Ticket t = new Ticket(partido, comprador, precio);
+        listaTickets.add(t);
+        return t;
+    }
+
+    // Reporte simple de ingresos (suma de todos los tickets vendidos)
+    public double generarReporteIngresos() {
+        double total = 0.0;
+        for (Ticket t : listaTickets) total += t.getPrecioPagado();
+        return total;
+    }
+
+    // Getters para UI y pruebas
+    public List<Cancha> getListaCanchas() { return new ArrayList<>(listaCanchas); }
+    public List<Reserva> getListaReservas() { return new ArrayList<>(listaReservas); }
+    public List<Ticket> getListaTickets() { return new ArrayList<>(listaTickets); }
+    public List<Audiencia> getListaAudiencias() { return new ArrayList<>(listaAudiencias); }
+}
