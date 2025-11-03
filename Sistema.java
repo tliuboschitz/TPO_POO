@@ -3,8 +3,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Sistema: controlador central del TP.
- * Contiene listas maestras y la lógica de negocio principal.
+ * Sistema: controlador central
+ * Contiene listas maestras y la logica de negocio principal.
  */
 public class Sistema {
 
