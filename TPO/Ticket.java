@@ -11,7 +11,7 @@ import java.util.UUID;
         private double precioPagado;
         
         
-        public Ticket(int idTicket, Partido partido, Audiencia comprador, double precioPagado) {
+        public Ticket(Partido partido, Audiencia comprador, double precioPagado) {
 
             this.idTicket = proximoId++; 
 
@@ -20,17 +20,5 @@ import java.util.UUID;
             this.comprador = comprador;
             this.precioPagado = precioPagado;
         }
-        public calcularPrecioFinal(Partido partido, Audiencia audiencia) {
-            double precioBase = partido.getPrecioTicketBase();
-            double precioFinal = precioBase;
-
-            if (audiencia.getEdad() < 12) {
-                precioFinal *= 0.5; 
-            } else if (audiencia.getEdad() >= 60) {
-                precioFinal *= 0.7; 
-            } else if (audiencia.getEdad() > 6) {
-                precioFinal *= 0;
-
-            return precioFinal;
-        }
+       
     }

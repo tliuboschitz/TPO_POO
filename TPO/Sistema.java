@@ -110,8 +110,14 @@ public Cancha buscarCanchaPorId(int idCancha) {
         }
         
         public Ticket venderTicket(Partido partido, Audiencia audiencia) {
-            Partido.calcularPrecio(partido, audiencia);
-            return null; // Placeholder
+            if (partido.estaLleno()) {
+                throw new IllegalStateException("Error al vender el ticket: El partido ya ha vendido todas las entradas disponibles.");
+            }
+            double precioFinal = partido.calcularPrecioFinal(partido, audiencia);
+            Ticket nuevoTicket = new Ticket(partido, audiencia, precioFinal);
+            partido.agregarTicket(nuevoTicket);
+            this.listaTickets.add(nuevoTicket);
+            return nuevoTicket;
         }
 
         // Método de soporte (Regla de Negocio)
