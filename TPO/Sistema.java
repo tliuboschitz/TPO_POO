@@ -110,7 +110,7 @@ public Cancha buscarCanchaPorId(int idCancha) {
         }
         
         public Ticket venderTicket(Partido partido, Audiencia audiencia) {
-            // Lógica para calcular precio (descuentos, etc) y crear Ticket
+            Partido.calcularPrecio(partido, audiencia);
             return null; // Placeholder
         }
 

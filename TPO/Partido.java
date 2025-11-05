@@ -11,6 +11,9 @@ public class Partido {
             this.equipos = equipos;
             this.precioTicketBase = precioTicket;
         }
+        public double getPrecioTicketBase() {
+            return precioTicketBase;
+        }
     }
 
     
