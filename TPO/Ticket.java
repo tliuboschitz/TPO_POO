@@ -9,13 +9,14 @@ import java.util.UUID;
         private Partido partido;
         private Audiencia comprador;
         private double precioPagado;
+        private static int proximoId = 1; // Variable estática para el próximo ID
         
         
         public Ticket(Partido partido, Audiencia comprador, double precioPagado) {
 
             this.idTicket = proximoId++; 
 
-            this.idTicket = idTicket;
+            
             this.partido = partido;
             this.comprador = comprador;
             this.precioPagado = precioPagado;

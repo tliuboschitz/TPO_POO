@@ -25,12 +25,13 @@ public class Partido {
             double precioBase = this.getPrecioTicketBase();
             double precioFinal = precioBase;
 
-        if (audiencia.getEdad() < 12) {
+        if(audiencia.getEdad() <= 6) {
+            precioFinal = 0; 
+        } else if (audiencia.getEdad() < 12) {
             precioFinal *= 0.5; 
         } else if (audiencia.getEdad() >= 60) {
             precioFinal *= 0.7; 
-        } else if (audiencia.getEdad() > 6) {
-            precioFinal *= 0;
+        }  
 
         return precioFinal;
         }
