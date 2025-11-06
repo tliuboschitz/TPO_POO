@@ -7,10 +7,9 @@ import java.util.ArrayList;
 
 
     // --- Clase Main para correr el sistema ---
- public class Main {
-
+public class Main {
     public static void main(String[] args) {
-        
+            
         // --- 1. SETUP DEL MODELO ---
         Sistema miSistema = new Sistema();
         
@@ -39,16 +38,14 @@ import java.util.ArrayList;
         
         try {
             int idParaCancelar = scanner.nextInt();
-
             miSistema.cancelarReserva(idParaCancelar);
-            
             System.out.println("ÉXITO: La reserva " + idParaCancelar + " fue cancelada.");
 
-        } catch (java.util.InputMismatchException e) {
-            System.err.println("Error: Debe ingresar un número entero.");
-        } catch (IllegalStateException e) {
-            System.err.println("ERROR: " + e.getMessage());
-        }
+            } catch (java.util.InputMismatchException e) {
+                System.err.println("Error: Debe ingresar un número entero.");
+            } catch (IllegalStateException e) {
+                System.err.println("ERROR: " + e.getMessage());
+            }
         
         scanner.close();
     }

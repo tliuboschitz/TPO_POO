@@ -11,16 +11,13 @@ public class Cancha {
 
     
     public Cancha(String nombre, String tipo, double precioHora) {
-        
-        
-        this.idCancha = proximoId++; 
-        
+        this.idCancha = proximoId++;
         this.nombre = nombre;
         this.tipo = tipo;
         this.precioHora = precioHora;
         this.estado = "Disponible";
     }
-        // Getters y Setters
+    // Getters y Setters
     public int getIdCancha() { 
         return idCancha;
     }
