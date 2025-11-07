@@ -24,6 +24,7 @@ public class Reserva {
             this.cancha = cancha;
             this.monto = cancha.getPrecioHora(); 
             this.estado = "Pendiente";
+
         }
         
         public int getIdReserva() {
