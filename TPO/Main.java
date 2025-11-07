@@ -35,6 +35,7 @@ import java.util.ArrayList;
             try {
                 Statement stmt = Conection.createStatement();
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PERSONA(nombre TEXT, apellido TEXT, dni INTEGER PRIMARY KEY NOT NULL)");
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ALQUILADOR(dniAl INTEGER PRIMARY KEY, FOREIGN KEY(dniAl) REFERENCES PERSONA(dni))");
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS AUDIENCIA(dniA INTEGER PRIMARY KEY, email TEXT, edad INTEGER, esSocio BOOLEAN, dniTutor INTEGER, FOREIGN KEY(dniA) REFERENCES PERSONA(dni), FOREIGN KEY(dniTutor) REFERENCES PERSONA(dni))");
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS EMPLEADO(dniE INTEGER PRIMARY KEY, rol TEXT, FOREIGN KEY(dniE) REFERENCES PERSONA(dni))");
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CANCHA(idCancha INTEGER PRIMARY KEY, nombreC TEXT, tipo TEXT, precioHora REAL, estado TEXT)");

@@ -19,16 +19,7 @@ public abstract class Persona {
 
         }
 
-        static Connection Conection;
 
-        static {
-            try {
-                Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         // Getters
         public String getNombre() { return nombre; }
@@ -36,6 +27,14 @@ public abstract class Persona {
         public int getDni() { return dni; }
 
         private void addTableP() throws SQLException {
+            Connection Conection;
+                try {
+                    Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
             String query = "INSERT INTO PERSONA(nombre, apellido, dni) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = Conection.prepareStatement(query)) {
                 stmt.setString(1, nombre);

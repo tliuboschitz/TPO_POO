@@ -13,5 +13,7 @@ import java.util.UUID;
             this.reserva = reserva;
             this.fechaEmision = new Date(); // Fecha de hoy
             // (generar un ID...)
+            // cambiar el generado en idCom si esta
         }
+
     }
