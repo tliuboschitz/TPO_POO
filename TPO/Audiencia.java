@@ -1,10 +1,13 @@
 package TPO;
+
+import java.sql.SQLException;
+
 class Audiencia extends Persona {
         private String email;
         private int edad;      
         private boolean esSocio; 
         private String tutorNombre; 
-        public Audiencia(String nombre, String apellido, String dni, String email, int edad, boolean esSocio, String tutor) {
+        public Audiencia(String nombre, String apellido, int dni, String email, int edad, boolean esSocio, String tutor) throws SQLException {
             super(nombre, apellido, dni);
             this.email = email;
             this.edad = edad;

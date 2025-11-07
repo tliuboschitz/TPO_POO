@@ -1,4 +1,5 @@
 package TPO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,19 +8,16 @@ import java.util.UUID;
 
 class Empleado extends Persona {
         private String rol;
-        private UUID iUuid;
         private List<Mantenimiento> tareasAsignadas;
 
-        public Empleado(String nombre, String apellido, String dni, String rol) {
+        public Empleado(String nombre, String apellido, int dni, String rol) throws SQLException {
             super(nombre, apellido, dni);
             this.rol = rol;
-            this.iUuid = UUID.randomUUID();
             // ¡Inicializar la lista!
             this.tareasAsignadas = new ArrayList<>(); 
         }
         
         // Getters
-        public UUID getiUuid() { return iUuid; }
         public String getRol() { return rol; }
 
         public void asignarTarea(Mantenimiento tarea) {

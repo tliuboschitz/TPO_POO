@@ -1,27 +1,47 @@
 package TPO;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
- public abstract class Persona {
-        protected String nombre;
-        protected String apellido;
-        protected String dni;
+import static TPO.Main.Conection;
 
-        public Persona(String nombre, String apellido, String dni) {
+
+public abstract class Persona {
+        private String nombre;
+        private String apellido;
+        private int dni;
+
+
+
+        public Persona(String nombre, String apellido, int dni) throws SQLException {
             this.nombre = nombre;
             this.apellido = apellido;
             this.dni = dni;
+            addTableP(Main.Conection);
+
         }
+
         // Getters
         public String getNombre() { return nombre; }
         public String getApellido() { return apellido; }
-        public String getDni() { return dni; }
+        public int getDni() { return dni; }
 
-        // Método toString() es el estándar en Java para esto
+        private void addTableP(Connection conn) throws SQLException {
+            String query = "INSERT INTO PERSONA (nombre, apellido, dni) VALUES (?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, nombre);
+                stmt.setString(2, apellido);
+                stmt.setInt(3, dni); // dni es int, no String
+                stmt.executeUpdate();
+            }
+        }
+
+
+
+    // Método toString() es el estándar en Java para esto
         @Override
         public String toString() {
+
             return apellido + ", " + nombre + " (DNI: " + dni + ")";
         }
     }
