@@ -14,13 +14,25 @@ import java.util.ArrayList;
  public class Main {
 
         static Connection Conection;
+        static {
+            try {
+                Class.forName("org.sqlite.JDBC");
+
+                Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");//Problemas con No suitable driver found for jdbc:sqlite:TPO.db
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        ;
 
 
 
         public static void main(String[] args) throws SQLException {
 
             try {
-            Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");
                 Statement stmt = Conection.createStatement();
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PERSONA(nombre TEXT, apellido TEXT, dni INTEGER PRIMARY KEY NOT NULL)");
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS AUDIENCIA(dniA INTEGER PRIMARY KEY, email TEXT, edad INTEGER, esSocio BOOLEAN, dniTutor INTEGER, FOREIGN KEY(dniA) REFERENCES PERSONA(dni), FOREIGN KEY(dniTutor) REFERENCES PERSONA(dni))");
