@@ -41,6 +41,7 @@ public abstract class Persona {
                 stmt.setString(2, apellido);
                 stmt.setInt(3, dni); // dni es int, no String
                 stmt.executeUpdate();
+                stmt.close();
             }
         }
 

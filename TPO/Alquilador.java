@@ -23,6 +23,7 @@ public class Alquilador extends Persona {
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setInt(1, dni);  // dni is passed as an integer
                 stmt.executeUpdate();
+                stmt.close();
             }
         }
     }

@@ -1,4 +1,7 @@
 package TPO;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,15 +17,34 @@ class Empleado extends Persona {
             super(nombre, apellido, dni);
             this.rol = rol;
             // ¡Inicializar la lista!
-            this.tareasAsignadas = new ArrayList<>(); 
+            this.tareasAsignadas = new ArrayList<>();
+            addTablaE(dni);
         }
-        
+
         // Getters
         public String getRol() { return rol; }
 
         public void asignarTarea(Mantenimiento tarea) {
             if(tarea != null) {
                 this.tareasAsignadas.add(tarea);
+            }
+        }
+
+        protected void addTablaE(int dni) throws SQLException {
+            Connection Conection;
+            try {
+                Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            String query = "INSERT INTO EMPLEADO(dni, rol) VALUES (?, ?)";
+            try (PreparedStatement stmt = Conection.prepareStatement(query)) {
+                stmt.setInt(1, dni);
+                stmt.setString(2, rol);
+                stmt.executeUpdate();
+                stmt.close();
             }
         }
         

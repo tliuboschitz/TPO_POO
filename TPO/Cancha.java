@@ -41,7 +41,7 @@ public class Cancha {
             throw new RuntimeException(e);
         }
 
-        String query = "INSERT INTO CANCHA(idCancha, nombreC, tipo, precioHora, estado) VALUES (?, ?, ?)";
+        String query = "INSERT INTO CANCHA(idCancha, nombreC, tipo, precioHora, estado) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = Conection.prepareStatement(query)) {
             stmt.setInt(1, idCancha);
             stmt.setString(2, nombre);
