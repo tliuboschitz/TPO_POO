@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static TPO.Main.Conection;
+
 public class Alquilador extends Persona {
     // private int canchasAlquiladas; // <-- CAMBIO: Esto es mala idea.
     // Es mejor que Sistema calcule esto buscando en las reservas,
@@ -18,12 +20,14 @@ public class Alquilador extends Persona {
     }
 
     protected void addTableA(int dni) throws SQLException {
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:TPO.db")) {
-            String query = "INSERT INTO ALQUILADOR(dniAl) VALUES (?)";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try{
+            String query = "INSERT or IGNORE INTO ALQUILADOR(dniAl) VALUES (?)";
+            PreparedStatement stmt = Conection.prepareStatement(query);
                 stmt.setInt(1, dni);  // dni is passed as an integer
                 stmt.executeUpdate();
-            }
+                stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

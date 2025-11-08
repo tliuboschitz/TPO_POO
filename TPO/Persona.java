@@ -4,7 +4,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public abstract class Persona {
+import static TPO.Main.Conection;
+
+public class Persona {
         private String nombre;
         private String apellido;
         private int dni;
@@ -19,29 +21,25 @@ public abstract class Persona {
 
         }
 
-
-
         // Getters
         public String getNombre() { return nombre; }
         public String getApellido() { return apellido; }
         public int getDni() { return dni; }
 
         private void addTableP() throws SQLException {
-            Connection Conection;
                 try {
-                    Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");
-
+                    String query = "INSERT or IGNORE INTO PERSONA(nombre, apellido, dni) VALUES (?, ?, ?)";
+                    PreparedStatement stmt = Conection.prepareStatement(query);
+                    stmt.setString(1, nombre);
+                    stmt.setString(2, apellido);
+                    stmt.setInt(3, dni); // dni es int, no String
+                    stmt.executeUpdate();
+                    stmt.close();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
 
-            String query = "INSERT INTO PERSONA(nombre, apellido, dni) VALUES (?, ?, ?)";
-            try (PreparedStatement stmt = Conection.prepareStatement(query)) {
-                stmt.setString(1, nombre);
-                stmt.setString(2, apellido);
-                stmt.setInt(3, dni); // dni es int, no String
-                stmt.executeUpdate();
-            }
+
         }
 
 
@@ -49,7 +47,6 @@ public abstract class Persona {
     // Método toString() es el estándar en Java para esto
         @Override
         public String toString() {
-
             return apellido + ", " + nombre + " (DNI: " + dni + ")";
         }
     }

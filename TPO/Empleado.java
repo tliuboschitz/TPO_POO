@@ -1,9 +1,14 @@
 package TPO;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static TPO.Main.Conection;
 
 
 class Empleado extends Persona {
@@ -14,9 +19,10 @@ class Empleado extends Persona {
             super(nombre, apellido, dni);
             this.rol = rol;
             // ¡Inicializar la lista!
-            this.tareasAsignadas = new ArrayList<>(); 
+            this.tareasAsignadas = new ArrayList<>();
+            addTablaE(dni);
         }
-        
+
         // Getters
         public String getRol() { return rol; }
 
@@ -25,9 +31,28 @@ class Empleado extends Persona {
                 this.tareasAsignadas.add(tarea);
             }
         }
-        
-        
-        public void gestionarPartido(Partido partido) {
+
+        protected void addTablaE(int dni) throws SQLException {
+            try {
+            String query = "INSERT or IGNORE INTO EMPLEADO(dniE, rol) VALUES (?, ?)";
+            PreparedStatement stmt = Conection.prepareStatement(query);
+                stmt.setInt(1, dni);
+                stmt.setString(2, rol);
+                stmt.executeUpdate();
+                stmt.close();
+            }
+            catch (SQLException ex) {
+                throw new SQLException(ex.getMessage());
+            }
+        }
+
+    @Override
+    public String toString() {
+        return  super.toString() +
+                ", Rol: " + rol ;
+    }
+
+    public void gestionarPartido(Partido partido) {
             // Lógica para gestionar un partido...
         }
 

@@ -8,6 +8,7 @@ class Encargado extends Empleado {
         }
 
         public void asignarTareaAEmpleado(Empleado emp, Mantenimiento tarea) {
+
             emp.asignarTarea(tarea);
         }
     }
