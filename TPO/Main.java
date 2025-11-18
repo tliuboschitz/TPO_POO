@@ -4,7 +4,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
-    import java.util.Scanner;
+import java.util.Scanner;
 
 
     // --- Clase Main para correr el sistema ---
@@ -22,7 +22,6 @@ import java.util.Date;
                 throw new RuntimeException(e);
             }
         }
-
         ;
 
 
@@ -57,7 +56,7 @@ import java.util.Date;
         // datos de prueba para que el sistema no esté vacío
         // Se puede cambiar a que el alquilador se ingrese por consola.
         // Mas adelante sera reemplazado por una interfaz gráfica.
-        Alquilador alquilador = new Alquilador("Juan", "Perez", "123");
+        Alquilador alquilador = new Alquilador("Juan", "Perez", 12345678);
         miSistema.registrarAlquilador(alquilador);
         
         Cancha cancha = miSistema.buscarCanchaPorId(3);

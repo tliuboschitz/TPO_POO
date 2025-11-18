@@ -8,7 +8,6 @@ import java.sql.SQLException;
 public class Cancha {
     // CONTADOR ESTÁTICO
     private static int proximoId = 1;
-
     private int idCancha;
     private String nombre;
     private String tipo; // "F11", "F9", "F5"
@@ -22,6 +21,7 @@ public class Cancha {
         this.tipo = tipo;
         this.precioHora = precioHora;
         this.estado = "Disponible";
+        
         addTablaC(idCancha, nombre, tipo, precioHora, estado);
     }
     // Getters y Setters
