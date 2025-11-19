@@ -93,13 +93,22 @@ public class Sistema {
     }
     
     public void cancelarReserva(int idReserva) {
-        // Lógica para buscar la reserva y setear estado "Cancelada"
+        // Busca la Reserva usando el método privado
+        Reserva reserva = this.buscarReservaPorId(idReserva);
+        
+        // Setear estado "Cancelada"
+        reserva.cancelar();
     }
     
     public Comprobante confirmarReserva(int idReserva) {
-        // Lógica para buscar reserva, setear estado "Confirmada"
-        // y generar un Comprobante.
-        return null; // Placeholder
+        // Busca la Reserva usando el método privado
+        Reserva reserva = this.buscarReservaPorId(idReserva);
+        
+        // Setear estado "Confirmada"
+        reserva.confirmar();
+        
+        // Generar y retornar un Comprobante
+        return reserva.generarComprobante();
     }
     
     public Partido crearPartido(int idReserva, String equipos, double precioTicketBase, int capacidadMaxima) {
