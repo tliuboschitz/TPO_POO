@@ -41,6 +41,15 @@ public class Partido {
 
 
     }
+
+    @Override
+    public String toString() {
+        return "Partido:" +
+                "\n PartidoID: " + idPartido +
+                "\n ReservaID: " + reserva.getIdReserva() +
+                "\n equipos:" + equipos +
+                "\n precioTicketBase: " + precioTicketBase;
     }
+}
 
     

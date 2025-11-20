@@ -22,6 +22,7 @@ import static TPO.Main.Conection;
         private List<Ticket> listaTickets;
         private List<Persona> listaPersonas;
         private List<Partido> listaPartidos;
+        private List<Mantenimiento>listaMantenimiento;
 
         // --- Constructor ---
         public Sistema() {
@@ -32,9 +33,8 @@ import static TPO.Main.Conection;
             this.listaEmpleados = new ArrayList<>();
             this.listaAlquiladores = new ArrayList<>();
             this.listaAudiencia = new ArrayList<>();
-            List<Partido> listaPartidos = new ArrayList<>();
             this.listaTickets = new ArrayList<>();
-            List<Mantenimiento> listaMantenimientos = new ArrayList<>();
+            this.listaMantenimiento = new ArrayList<>();
 
         }
 
@@ -224,8 +224,8 @@ import static TPO.Main.Conection;
             while(resultSet5.next()) {
                 int idReserva = resultSet5.getInt("idReserva");
                 String dateInt = resultSet5.getString("date");
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-                Date date = format.parse(dateInt);
+                SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy"); //Funciono pero se muestra como  fecha:Thu May 22 00:00:00 GMT-03:00 2025
+                Date date = f.parse(dateInt);
                 int hora = resultSet5.getInt("hora");
                 int AlquiladorId = resultSet5.getInt("Alquilador");
                 Alquilador alquilador = buscarAlquiladorbyId(AlquiladorId);
@@ -270,10 +270,10 @@ import static TPO.Main.Conection;
                     Empleado empleado = buscarEmpleadoPorId(dni);
                     int canchaid = resultSet8.getInt("CanchaId");
                     Cancha cancha = buscarCanchaPorId(canchaid);
-                    String descripcionMantenimiento = resultSet8.getString("descripcionMantenimiento");
-                    String estadoMantenimiento = resultSet8.getString("estadoMantenimiento");
-                    Mantenimiento mantenimiento = new Mantenimiento(idMantenimiento, empleado, cancha, descripcionMantenimiento);
-                    listaMantenimiento.add()
+                    String descripcion = resultSet8.getString("descripcion");
+                    String estadoMantenimiento = resultSet8.getString("estado");
+                    Mantenimiento mantenimiento = new Mantenimiento(idMantenimiento, descripcion, cancha);
+                    listaMantenimiento.add(mantenimiento);
 
                 }
 
@@ -295,6 +295,7 @@ import static TPO.Main.Conection;
 
     public List<Alquilador> getListaAlquiladores() {return listaAlquiladores;}
     public List<Partido> getListaPartidos() {return listaPartidos;}
+    public List<Mantenimiento> getListaMantenimiento() { return new ArrayList<>(listaMantenimiento); }
 
     public List<Audiencia> getListaAudiencias() {return new ArrayList<>(listaAudiencia);  }
 }

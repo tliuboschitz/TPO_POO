@@ -38,4 +38,13 @@ class Ticket {
                 throw new RuntimeException(e);
             }
         }
+
+    @Override
+    public String toString() {
+        return "\n Ticket: " +
+                "\n idTicket: " + idTicket +
+                "\n partido:" + partido.getIdPartido() +
+                "\n comprador:" + comprador.getNombre() + comprador.getApellido() +
+                "\n precioPagado:" + precioPagado + "\n";
     }
+}

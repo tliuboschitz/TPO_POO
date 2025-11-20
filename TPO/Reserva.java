@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,4 +73,17 @@ public class Reserva {
         public Comprobante generarComprobante() {
             return new Comprobante(this);
         }
+
+    @Override
+    public String toString() {
+        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
+        return "Reserva{" +
+                "idReserva:" + idReserva +
+                "\n fecha:" + f.format(fecha) +
+                "\n hora:" + hora +
+                "\n alquilador:" + alquilador +
+                "\n cancha:" + cancha +
+                "\n monto:" + monto +
+                "\n estado:" + estado + "\n" ;
     }
+}

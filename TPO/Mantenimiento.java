@@ -24,10 +24,10 @@ class Mantenimiento {
 
         protected void addTablaM(int idCancha) throws SQLException {
             try {
-                String query = "INSERT INTO MANTENIMIENTO(idMantenimiento, dni, descripcion, CanchaId, estado) VALUES (?, ?, ?, ?, ?)";
+                String query = "INSERT OR IGNORE INTO MANTENIMIENTO(idMantenimiento, dni, descripcion, CanchaId, estado) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement stmt = Conection.prepareStatement(query);
                 stmt.setInt(1, idMantenimiento);
-                stmt.setInt(2,  0); //Equivale a que no haya nadie asignado a la tarea
+                stmt.setInt(2,  -1); //Equivale a que no haya nadie asignado a la tarea
                 stmt.setString(3, descripcion);
                 stmt.setInt(4, idCancha); // dni es int, no String
                 stmt.setString(5, estado);
@@ -38,4 +38,13 @@ class Mantenimiento {
                 throw new RuntimeException(e);
             }
         }
+
+    @Override
+    public String toString() {
+        return "Mantenimiento:" +
+                "\n idMantenimiento: " + idMantenimiento +
+                "\n descripcion: " + descripcion +
+                "\n canchaAfectada:" + canchaAfectada +
+                "\n estado:" + estado;
     }
+}

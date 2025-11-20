@@ -54,7 +54,7 @@ import java.util.ArrayList;
         // --- 1. SETUP DEL MODELO ---
         Sistema miSistema = new Sistema();
         miSistema.TestProcessing();
-        System.out.println(miSistema.getListaAudiencias());
+        System.out.println(miSistema.getListaMantenimiento());
         
         // datos de prueba para que el sistema no esté vacío
         // Se puede cambiar a que el alquilador se ingrese por consola.
