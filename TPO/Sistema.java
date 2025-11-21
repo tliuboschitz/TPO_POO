@@ -1,301 +1,261 @@
 package TPO;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static TPO.Main.Conection;
+/**
+ * Sistema: controlador central
+ * Contiene listas maestras y la logica de negocio principal.
+ */
+public class Sistema {
 
-
-// --- CLASES DE PERSONAS REFACTORIZADAS ---
-    public class Sistema {
-        // --- Listas Maestras ---
-        private List<Cancha> listaCanchas;
-        private List<Reserva> listaReservas;
-        private List<Empleado> listaEmpleados;
-        private List<Alquilador> listaAlquiladores; 
-        private List<Audiencia> listaAudiencia;
-        private List<Ticket> listaTickets;
-        private List<Persona> listaPersonas;
-        private List<Partido> listaPartidos;
-        private List<Mantenimiento>listaMantenimiento;
-
-        // --- Constructor ---
-        public Sistema() {
-            this.listaPartidos = new ArrayList<>();
-            this.listaPersonas = new ArrayList<>();
-            this.listaCanchas = new ArrayList<>();
-            this.listaReservas = new ArrayList<>();
-            this.listaEmpleados = new ArrayList<>();
-            this.listaAlquiladores = new ArrayList<>();
-            this.listaAudiencia = new ArrayList<>();
-            this.listaTickets = new ArrayList<>();
-            this.listaMantenimiento = new ArrayList<>();
-
+    static Connection Conection;
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");//Problemas con No suitable driver found for jdbc:sqlite:TPO.db
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
+    };
 
+    private static List<Cancha> listaCanchas;
+    private static List<Reserva> listaReservas;
+    private static List<Empleado> listaEmpleados;
+    private static List<Alquilador> listaAlquiladores;
+    private static List<Audiencia> listaAudiencias;
+    private static List<Partido> listaPartidos;
+    private List<Ticket> listaTickets;
+    private List<Mantenimiento> listaMantenimientos;
 
+    private int proximoIdPartido = 1; // id secuencial para partidos
 
-        public void registrarCancha(Cancha cancha) {
-            this.listaCanchas.add(cancha);
-        }
-        
-        public void registrarEmpleado(Empleado empleado) {
-            this.listaEmpleados.add(empleado);
-        }
-        
-        public void registrarAlquilador(Alquilador alquilador) {
-            this.listaAlquiladores.add(alquilador);
-        }
-        
-        public void registrarAudiencia(Audiencia audiencia) {
-            this.listaAudiencia.add(audiencia);
-        }
+    public Sistema() throws SQLException, ParseException {
+        this.listaCanchas = new ArrayList<>();
+        this.listaReservas = new ArrayList<>();
+        this.listaEmpleados = new ArrayList<>();
+        this.listaAlquiladores = new ArrayList<>();
+        this.listaAudiencias = new ArrayList<>();
+        this.listaPartidos = new ArrayList<>();
+        this.listaTickets = new ArrayList<>();
+        this.listaMantenimientos = new ArrayList<>();
+        SQLAlquilador.SQLProcessing(listaAlquiladores);
+        SQLEmpleado.SQLProcessing(listaEmpleados);
+        SQLAudiencia.SQLProcessing(listaAudiencias);
+        SQLCancha.SQLProcessing(listaCanchas);
+        SQLReserva.SQLProcessing(listaReservas);
+        SQLPartidos.SQLProcessing(listaPartidos);
+        SQLTicket.SQLProcessing(listaTickets);
+        SQLMantenimiento.SQLProcessing(listaMantenimientos);
 
-        // Recorre la lista de reservas y devuelve la que coincide con el idReserva, si no coincide lanza excepción.
-        private Reserva buscarReservaPorId(int idReserva) {
-            for (Reserva res : listaReservas) {
-                if (res.getIdReserva() == idReserva) {
-                    return res;
-                }
-            }
-            throw new IllegalStateException("Error al buscar la reserva: Reserva no encontrada.");                      
-        }
-
-        // Recorre la lista de canchas y devuelve la que coincide con el idCancha
-        public Cancha buscarCanchaPorId(int idCancha) {
-            for (Cancha c : listaCanchas) {
-                if (c.getIdCancha() == idCancha) {
-                    return c;
-                }
-            }
-            throw new IllegalStateException("Error: No se encontró ninguna cancha con el ID " + idCancha);
-        }
-
-        public Empleado buscarEmpleadoPorId(int idEmpleado) {
-            for (Empleado empleado : listaEmpleados) {
-                if(empleado.getDni() == idEmpleado) {
-                    return empleado;
-                }
-            }
-            return null;
-        }
-
-        public Audiencia buscarAudienciaPorId(int idAudiencia) {
-            for (Audiencia audiencia : listaAudiencia) {
-                if(audiencia.getDni() == idAudiencia) {
-                    return audiencia;
-                }
-
-            }
-            return  null;
-        }
-
-        public Partido buscarPartidoPorId(int idPartido) {
-            for (Partido partido : listaPartidos) {
-                if (partido.getIdPartido() == idPartido) {
-                    return partido;
-                }
-            }
-            return  null;
-        }
-
-
-        public List<Cancha> buscarDisponibilidad(Date fecha, int hora, String tipoCancha) {
-            // Lógica para buscar canchas...
-            return new ArrayList<>(); // Devuelve lista vacía por ahora
-        }
-        
-        public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, int hora) {
-
-        if (!this.estaDisponible(cancha, fecha, hora)) {
-            
-            throw new IllegalStateException("Error al crear la reserva: La cancha " + 
-                                    cancha.getNombre() + " ya está ocupada en ese horario.");
-        }
-
-        Reserva nuevaReserva = new Reserva(fecha, hora, alquilador, cancha);
-        this.listaReservas.add(nuevaReserva);
-        return nuevaReserva;
     }
-        
-        public void cancelarReserva(int idReserva) {
-            // Lógica para buscar la reserva y setear estado "Cancelada"
-        }
-        
-        public Comprobante confirmarReserva(int idReserva) {
-            // Lógica para buscar reserva, setear estado "Confirmada"
-            // y generar un Comprobante.
-            return null; // Placeholder
-        }
-        
-        public Partido crearPartido(Reserva reserva, String equipos, double precioTicket) {
-            // Lógica para crear el partido...
-            return null; // Placeholder
-        }
-        
-        public Ticket venderTicket(Partido partido, Audiencia audiencia) {
-            // Lógica para calcular precio (descuentos, etc) y crear Ticket
-            return null; // Placeholder
-        }
 
-        // Método de soporte (Regla de Negocio)
-        private boolean estaDisponible(Cancha cancha, Date fecha, int hora) {
-            // Lógica de chequeo que vimos...
-            return true; // Placeholder
+    public static Empleado buscarEmpleadoPorId(int idEmpleado) {
+        for (Empleado empleado : listaEmpleados) {
+            if(empleado.getDni() == idEmpleado) {
+                return empleado;
+            }
         }
+        return null;
+    }
 
-        public Persona buscarPersonabyID(int idPersona) {
-            for (Persona c : listaPersonas) {
-                if (c.getDni() == idPersona) {
-                    return c;
+
+    // --- REGISTROS ---
+    public void registrarCancha(Cancha c) { if (c!=null) listaCanchas.add(c); }
+    public void registrarEmpleado(Empleado e) { if (e!=null) listaEmpleados.add(e); }
+    public void registrarAlquilador(Alquilador a) { if (a!=null) listaAlquiladores.add(a); }
+    public void registrarAudiencia(Audiencia a) { if (a!=null) listaAudiencias.add(a); }
+
+    // --- RESERVAS ---
+    public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) throws SQLException {
+        if (alquilador == null) throw new IllegalArgumentException("Alquilador nulo.");
+        if (cancha == null) throw new IllegalArgumentException("Cancha nula.");
+        if (!estaDisponible(cancha, fecha, hora)) throw new IllegalStateException("Cancha ocupada en ese horario.");
+        Reserva r = new Reserva(fecha, hora, alquilador, cancha);
+        listaReservas.add(r);
+        return r;
+    }
+    public void cancelarReserva(int idReserva) {
+        Reserva r = buscarReservaPorId(idReserva);
+        if (r.getEstado().equals("Cancelada")) throw new IllegalStateException("Reserva ya cancelada.");
+        r.cancelar();
+    }
+    private boolean tieneReserva(Cancha cancha, Date fecha, String hora) {
+        for (Reserva res : this.listaReservas) {
+            // Coincide Cancha, Fecha y Hora
+            if (res.getCancha().getIdCancha() == cancha.getIdCancha() &&
+                esMismoDia(res.getFecha(), fecha) &&
+                res.getHora().equals(hora)) {
+                
+                // Si la reserva NO está cancelada, ocupa lugar
+                if (!res.getEstado().equals("Cancelada")) {
+                    return true; // SÍ, tiene reserva
                 }
             }
-            return null;
+        }
+        return false; // No tiene reserva
+    }  
+    public Comprobante confirmarReserva(int idReserva) {
+        Reserva r = buscarReservaPorId(idReserva);
+        if (r.getEstado().equals("Confirmada")) throw new IllegalStateException("Reserva ya confirmada.");
+        r.confirmar();
+        Comprobante c = r.generarComprobante();
+        return c;
+    }
+    
+    // Busca reserva por id, lanza excepción si no existe
+    public static Reserva buscarReservaPorId(int id) {
+        for (Reserva r : listaReservas) if (r.getIdReserva() == id) return r;
+        throw new IllegalStateException("Reserva no encontrada (id=" + id + ").");
+    }
+    
+    // Recorre la lista de canchas y devuelve la que coincide con el idCancha
+    public static Cancha buscarCanchaPorId(int idCancha) {
+        for (Cancha c : listaCanchas) {
+            if (c.getIdCancha() == idCancha) {
+                return c;
+            }
+        }
+        throw new IllegalStateException("Error: No se encontró ninguna cancha con el ID " + idCancha);
+    }
+
+    public boolean estaDisponible(Cancha cancha, Date fecha, String hora) {
+    
+        // 1. Chequeamos Mantenimiento
+        if (this.estaEnMantenimiento(cancha, fecha)) {
+            System.out.println("Disponibilidad: NO. La cancha está en mantenimiento.");
+            return false;
         }
 
-        public Alquilador buscarAlquiladorbyId(int idPersona) {
-            for (Alquilador c : listaAlquiladores) {
-                if (c.getDni() == idPersona) {
-                    return c;
+        // 2. Chequeamos Reservas
+        if (this.tieneReserva(cancha, fecha, hora)) {
+            System.out.println("Disponibilidad: NO. La cancha ya está reservada.");
+            return false;
+        }
+
+        // 3. Si pasó ambos filtros
+        System.out.println("Disponibilidad: SÍ. Puede reservar.");
+        return true;
+    }
+
+    public static Audiencia buscarAudienciaPorId(int idAudiencia) {
+        for (Audiencia audiencia : listaAudiencias) {
+            if(audiencia.getDni() == idAudiencia) {
+                return audiencia;
+            }
+
+        }
+        return  null;
+    }
+
+    public static Alquilador buscarAlquiladorbyId(int idPersona) {
+        for (Alquilador c : listaAlquiladores) {
+            if (c.getDni() == idPersona) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+
+    public Mantenimiento buscMantenimientoarPorId(int idMantenimiento) {
+        for (Mantenimiento m : listaMantenimientos) {
+            if (m.getIdMantenimiento() == idMantenimiento) {
+                return m;
+            }
+        }
+        throw new IllegalStateException("Error: No se encontró ningún mantenimiento con el ID " + idMantenimiento);
+    }
+    public void asignarTareaMantenimiento(Empleado empleado, Mantenimiento tarea) {
+        empleado.asignarTarea(tarea);
+    }
+    public Mantenimiento finalizarMantenimiento(int idMantenimiento) {
+        Mantenimiento mantenimiento = this.buscMantenimientoarPorId(idMantenimiento);
+        mantenimiento.finalizar();
+        return mantenimiento;
+    }
+    public Mantenimiento crearMantenimiento(String descripcion, Cancha cancha, Date fecha) {
+        Mantenimiento nuevoMantenimiento = new Mantenimiento(descripcion, cancha, fecha);
+        this.listaMantenimientos.add(nuevoMantenimiento);
+        return nuevoMantenimiento;
+    }
+    
+    
+    // --- PARTIDOS ---
+    public Partido crearPartido(Reserva reserva, String equipos, double precioTicketBase, int capacidadMaximaTickets) throws SQLException {
+        if (reserva == null) throw new IllegalArgumentException("Reserva nula.");
+        // confirmar automáticamente la reserva si está pendiente
+        if (reserva.getEstado().equals("Pendiente")) reserva.confirmar();
+        Partido p = new Partido(reserva, equipos, precioTicketBase, capacidadMaximaTickets);
+        listaPartidos.add(p);
+        SQLPartidos.addTablaPartido(p.getIdPartido(), reserva.getIdReserva(), equipos, precioTicketBase);
+        return p;
+    }
+
+    public static Partido buscarPartidoPorId(int idPartido) {
+        for (Partido partido : listaPartidos) {
+            if (partido.getIdPartido() == idPartido) {
+                return partido;
+            }
+        }
+        return  null;
+    }
+
+
+    public List<Partido> getListaPartidos() { return new ArrayList<>(listaPartidos); }
+
+    public boolean esMismoDia(Date a, Date b) {
+        if (a == null || b == null) return false;
+        java.util.Calendar ca = java.util.Calendar.getInstance();
+        ca.setTime(a);
+        java.util.Calendar cb = java.util.Calendar.getInstance();
+        cb.setTime(b);
+        return ca.get(java.util.Calendar.YEAR) == cb.get(java.util.Calendar.YEAR)
+            && ca.get(java.util.Calendar.DAY_OF_YEAR) == cb.get(java.util.Calendar.DAY_OF_YEAR);
+    }
+
+    private boolean estaEnMantenimiento(Cancha cancha, Date fecha) {
+        for (Mantenimiento mant : this.listaMantenimientos) {
+            // Coincide Cancha Y Coincide Fecha
+            if (mant.getCanchaAfectada().getIdCancha() == cancha.getIdCancha() &&
+                esMismoDia(mant.getFecha(), fecha)) {
+                
+                // Si NO está finalizado, entonces está en mantenimiento
+                if (!mant.getEstado().equals("Finalizado")) {
+                    return true; // SÍ, está en mantenimiento
                 }
             }
-            return null;
         }
+        return false; // No encontramos nada, no está en mantenimiento
+    }
 
-
-
-
-        //Solo mostrara listas de canchas solo disponibles para interfaz del usuario
-        public void TestProcessing() throws SQLException, ParseException {
-            Statement stmt = Conection.createStatement();
-            ResultSet resultSet = stmt.executeQuery("Select nombreC, tipo, precioHora from CANCHA where estado like 'Disponible'");
-            //Canchas
-            while (resultSet.next()) {
-                String c = resultSet.getString("nombreC");
-                String tipo = resultSet.getString("tipo");
-                double precioHora = resultSet.getDouble("precioHora");
-                Cancha cancha = new Cancha(c, tipo, precioHora);
-                listaCanchas.add(cancha);
-            }
-            ResultSet resultSet1 = stmt.executeQuery("SELECT nombre, apellido, dni FROM PERSONA");
-            while (resultSet1.next()) {
-                String nombre = resultSet1.getString("nombre");
-                String apellido = resultSet1.getString("apellido");
-                int dni =  resultSet1.getInt("dni");
-                Persona persona = new Persona(nombre, apellido, dni);
-                listaPersonas.add(persona);
-            }
-            ResultSet resultSet2 = stmt.executeQuery("SELECT nombre, apellido, dniE, rol from EMPLEADO inner join PERSONA P on P.dni = EMPLEADO.dniE");
-            while (resultSet2.next()) {
-                String nombre = resultSet2.getString("nombre");
-                String apellido = resultSet2.getString("apellido");
-                int dniE =  resultSet2.getInt("dniE");
-                String rol = resultSet2.getString("rol");
-                Empleado empleado = new Empleado(nombre, apellido, dniE, rol);
-                listaEmpleados.add(empleado);
-            }
-            ResultSet resultSet3 = stmt.executeQuery("SELECT nombre, apellido, dniAl from ALQUILADOR inner join PERSONA P on P.dni = ALQUILADOR.dniAl");
-            while (resultSet3.next()) {
-                String nombre = resultSet3.getString("nombre");
-                String apellido = resultSet3.getString("apellido");
-                int dniAl =  resultSet3.getInt("dniAl");
-                Alquilador alquilador = new Alquilador(nombre, apellido, dniAl);
-                listaAlquiladores.add(alquilador);
-            }
-            ResultSet resultSet4 = stmt.executeQuery("SELECT nombre, apellido, dniA, email, edad, esSocio, dniTutor from AUDIENCIA inner join PERSONA P on P.dni = AUDIENCIA.dniA");
-            while (resultSet4.next()) {
-                String nombre = resultSet4.getString("nombre");
-                String apellido = resultSet4.getString("apellido");
-                int dniA =  resultSet4.getInt("dniA");
-                String email = resultSet4.getString("email");
-                int edad = resultSet4.getInt("edad");
-                boolean esSocio = resultSet4.getBoolean("esSocio");
-                int dniTutor =  resultSet4.getInt("dniTutor");
-                Audiencia audiencia = new Audiencia(nombre, apellido,  dniA, email, edad, esSocio, dniTutor);
-                listaAudiencia.add(audiencia);
-            }
-
-            ResultSet resultSet5 = stmt.executeQuery("select idReserva, date, hora, Alquilador, Cancha, monto, estado, idComprobante from RESERVA");
-            while(resultSet5.next()) {
-                int idReserva = resultSet5.getInt("idReserva");
-                String dateInt = resultSet5.getString("date");
-                SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy"); //Funciono pero se muestra como  fecha:Thu May 22 00:00:00 GMT-03:00 2025
-                Date date = f.parse(dateInt);
-                int hora = resultSet5.getInt("hora");
-                int AlquiladorId = resultSet5.getInt("Alquilador");
-                Alquilador alquilador = buscarAlquiladorbyId(AlquiladorId);
-                int CanchaA = resultSet5.getInt("Cancha");
-                Cancha  cancha = buscarCanchaPorId(CanchaA);
-                int monto = resultSet5.getInt("monto");
-                int estado = resultSet5.getInt("estado");
-                int idComprobante = resultSet5.getInt("idComprobante");
-                Reserva reserva = new Reserva(date, hora, alquilador, cancha);
-                listaReservas.add(reserva);
-            }
-
-            ResultSet resultSet6 = stmt.executeQuery("SELECT idPartido, Reserve, equipos, precioTicketBase from PARTIDO");
-            while (resultSet6.next()) {
-                int idPartido = resultSet6.getInt("idPartido");
-                int ReserveId = resultSet6.getInt("Reserve");
-                Reserva reserva = buscarReservaPorId(ReserveId);
-                String equipos = resultSet6.getString("equipos");
-                double precioTicketBase = resultSet6.getDouble("precioTicketBase");
-                Partido partido = new Partido(idPartido, reserva, equipos, precioTicketBase);
-                listaPartidos.add(partido);
-
-            }
-            ResultSet resultSet7 = stmt.executeQuery("select idTicket, Partido, dniComprador, precioPagado from TICKET");
-            while (resultSet7.next()) {
-                int idTicket = resultSet7.getInt("idTicket");
-                int PartidoId = resultSet7.getInt("Partido");
-                Partido partido = buscarPartidoPorId(PartidoId);
-                int dniComprador = resultSet7.getInt("dniComprador");
-                Audiencia comprador= buscarAudienciaPorId(dniComprador);
-                int precioPagado = resultSet7.getInt("precioPagado");
-                Ticket ticket = new Ticket(idTicket, partido, comprador, precioPagado );
-                listaTickets.add(ticket);
-
-            }
-
-            ResultSet resultSet8 = stmt.executeQuery("select idMantenimiento, dni, descripcion, CanchaId, estado from MANTENIMIENTO");
-
-                while(resultSet8.next()) {
-                    int idMantenimiento = resultSet8.getInt("idMantenimiento");
-                    int dni = resultSet8.getInt("dni");
-                    Empleado empleado = buscarEmpleadoPorId(dni);
-                    int canchaid = resultSet8.getInt("CanchaId");
-                    Cancha cancha = buscarCanchaPorId(canchaid);
-                    String descripcion = resultSet8.getString("descripcion");
-                    String estadoMantenimiento = resultSet8.getString("estado");
-                    Mantenimiento mantenimiento = new Mantenimiento(idMantenimiento, descripcion, cancha);
-                    listaMantenimiento.add(mantenimiento);
-
-                }
-
-
-
-            stmt.close();
+    // --- TICKETS ---
+    public Ticket venderTicket(Partido partido, Audiencia comprador) throws SQLException {
+        if (partido == null || comprador == null) throw new IllegalArgumentException("Partido o comprador nulo.");
+        if (partido.estaLleno()) {
+            throw new IllegalStateException("Error al vender el ticket: El partido ya ha vendido todas las entradas disponibles.");
         }
+        double precioFinal = partido.calcularPrecioFinal(comprador);
+        Ticket t = new Ticket(partido, comprador, precioFinal);
+        listaTickets.add(t);
+        return t;
+    }
 
+    // Reporte simple de ingresos (suma de todos los tickets vendidos)
+    public double generarReporteIngresos() {
+        double total = 0.0;
+        for (Ticket t : listaTickets) total += t.getPrecioPagado();
+        return total;
+    }
 
-
-        public List<Cancha> getListaCanchas() {
-            return new ArrayList<>(listaCanchas);
-        }
-
-        public List<Reserva> getListaReservas() { return new ArrayList<>(listaReservas); }
-        public List<Ticket> getListaTickets() { return new ArrayList<>(listaTickets); }
-        public List<Persona> getListaPersonas() { return new ArrayList<>(listaPersonas); }
-        public List<Empleado> getListaEmpleados() {return new ArrayList<>(listaEmpleados);}
-
-    public List<Alquilador> getListaAlquiladores() {return listaAlquiladores;}
-    public List<Partido> getListaPartidos() {return listaPartidos;}
-    public List<Mantenimiento> getListaMantenimiento() { return new ArrayList<>(listaMantenimiento); }
-
-    public List<Audiencia> getListaAudiencias() {return new ArrayList<>(listaAudiencia);  }
+    // Getters para UI y pruebas
+    public List<Cancha> getListaCanchas() { return new ArrayList<>(listaCanchas); }
+    public List<Reserva> getListaReservas() { return new ArrayList<>(listaReservas); }
+    public List<Ticket> getListaTickets() { return new ArrayList<>(listaTickets); }
+    public List<Audiencia> getListaAudiencias() { return new ArrayList<>(listaAudiencias); }
 }

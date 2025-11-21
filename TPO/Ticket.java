@@ -1,50 +1,41 @@
 package TPO;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
-import static TPO.Main.Conection;
+public class Ticket {
+    private static int contador = 1;
+    private int idTicket;
+    private Partido partido;
+    private Audiencia comprador;
+    private double precioPagado;
+
+    public Ticket(Partido partido, Audiencia comprador, double precioPagado) throws SQLException {
+        this.idTicket = contador++;
+        this.partido = partido;
+        this.comprador = comprador;
+        this.precioPagado = precioPagado;
+        SQLTicket.addTablaT(this.idTicket, partido.getIdPartido(), comprador.getDni(),precioPagado);
+    }
+
+    public Ticket(int idTicket, Partido partido, Audiencia comprador, double precioPagado) {
+        this.idTicket = idTicket;
+        this.partido = partido;
+        this.comprador = comprador;
+        this.precioPagado = precioPagado;
+
+        if (idTicket >= contador)
+            contador = idTicket + 1;   // keep counter correct
+    }
 
 
-class Ticket {
-        private int idTicket;
-        private Partido partido;
-        private Audiencia comprador;
-        private double precioPagado;
-        
-        public Ticket(int idTicket, Partido partido, Audiencia comprador, double precioPagado) {
-            this.idTicket = idTicket;
-            this.partido = partido;
-            this.comprador = comprador;
-            this.precioPagado = precioPagado;
-            addTablaT(partido.getIdPartido(), comprador.getDni());
-        }
-
-        protected void addTablaT(int idPartido, int dniComprador) {
-            try {
-                String query = "INSERT OR IGNORE INTO TICKET(idTicket, Partido, dniComprador, precioPagado) VALUES (?, ?, ?, ?)";
-                PreparedStatement stmt = Conection.prepareStatement(query);
-                stmt.setInt(1, idTicket);
-                stmt.setInt(2, idPartido);
-                stmt.setInt(3, dniComprador);
-                stmt.setDouble(4, precioPagado);// dni es int, no String
-                stmt.executeUpdate();
-                stmt.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public int getIdTicket() { return idTicket; }
+    public Partido getPartido() { return partido; }
+    public Audiencia getComprador() { return comprador; }
+    public double getPrecioPagado() { return precioPagado; }
 
     @Override
     public String toString() {
-        return "\n Ticket: " +
-                "\n idTicket: " + idTicket +
-                "\n partido:" + partido.getIdPartido() +
-                "\n comprador:" + comprador.getNombre() + comprador.getApellido() +
-                "\n precioPagado:" + precioPagado + "\n";
+        return "Ticket#" + idTicket + " - Partido: " + (partido!=null?partido.getEquipos():"N/A")
+                + " - Comprador: " + (comprador!=null?comprador.getNombre():"N/A") + " - $" + precioPagado;
     }
 }

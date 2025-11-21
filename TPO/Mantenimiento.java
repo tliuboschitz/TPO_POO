@@ -1,50 +1,66 @@
 package TPO;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Date;
+/**
+ * Mantenimiento: tarea sobre una cancha (pendiente/terminado).
+ * Se puede marcar como terminado y entonces la cancha vuelve a disponible.
+ */
+public class Mantenimiento {
+    private static int proximoId = 1;
+    private int idMantenimiento;
+    private String descripcion;
+    private Cancha canchaAfectada;
+    private Date fecha; // Fecha del bloqueo
+    private String estado; // "Pendiente", "En Curso", "Finalizado"
 
-import static TPO.Main.Conection;
+    public Mantenimiento(String descripcion, Cancha cancha) {
+        this.idMantenimiento = proximoId++;
+        this.descripcion = descripcion;
+        this.canchaAfectada = cancha;
+        this.estado = "Pendiente";
 
-class Mantenimiento {
-        private int idMantenimiento;
-        private String descripcion;
-        private Cancha canchaAfectada;
-        private String estado; // "Pendiente", "Terminado"
+    }
 
-        public Mantenimiento(int id, String desc, Cancha cancha) throws SQLException {
-            this.idMantenimiento = id;
-            this.descripcion = desc;
-            this.canchaAfectada = cancha;
-            this.estado = "Pendiente";
-            addTablaM(cancha.getIdCancha()  );
-        }
+    public Mantenimiento(String descripcion, Cancha cancha, int idMantenimiento) throws SQLException {
+        this.idMantenimiento = idMantenimiento;
+        this.descripcion = descripcion;
+        this.canchaAfectada = cancha;
+        this.estado = "Pendiente";
+        if (idMantenimiento >= proximoId)
+            proximoId = idMantenimiento + 1;
+        SQLMantenimiento.addTablaM(idMantenimiento, descripcion, String.valueOf(cancha.getIdCancha()), estado);
+    }
 
+    public Mantenimiento(String descripcion, Cancha cancha, Date fecha) {
+        this.idMantenimiento = proximoId++;
+        this.descripcion = descripcion;
+        this.canchaAfectada = cancha;
+        this.fecha = fecha;
+        this.estado = "Pendiente";
+    }
 
-        protected void addTablaM(int idCancha) throws SQLException {
-            try {
-                String query = "INSERT OR IGNORE INTO MANTENIMIENTO(idMantenimiento, dni, descripcion, CanchaId, estado) VALUES (?, ?, ?, ?, ?)";
-                PreparedStatement stmt = Conection.prepareStatement(query);
-                stmt.setInt(1, idMantenimiento);
-                stmt.setInt(2,  -1); //Equivale a que no haya nadie asignado a la tarea
-                stmt.setString(3, descripcion);
-                stmt.setInt(4, idCancha); // dni es int, no String
-                stmt.setString(5, estado);
-                stmt.executeUpdate();
-                stmt.close();
-            }
-            catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    // Getters y Setters
+    public int getIdMantenimiento() { return idMantenimiento; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public Cancha getCanchaAfectada() { return canchaAfectada; }
+    public Date getFecha() { return fecha; }
+    public String getEstado() { return estado; }
 
+    // Marca la tarea como terminada y vuelve a poner la cancha "Disponible"
+    public void marcarComoTerminado() {
+        this.estado = "Terminado";
+        if (canchaAfectada != null) canchaAfectada.setEstado("Disponible");
+    }
+
+    // Método para cerrar el mantenimiento (manual)
+    public void finalizar() {
+        this.estado = "Finalizado";
+    }
     @Override
     public String toString() {
-        return "Mantenimiento:" +
-                "\n idMantenimiento: " + idMantenimiento +
-                "\n descripcion: " + descripcion +
-                "\n canchaAfectada:" + canchaAfectada +
-                "\n estado:" + estado;
+        return "Mantenimiento#" + idMantenimiento + " - " + descripcion + " - " + estado;
     }
 }
