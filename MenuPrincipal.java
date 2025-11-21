@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
+import java.text.ParseException;
 
 /**
  * MenuPrincipal:
@@ -16,7 +18,13 @@ public class MenuPrincipal extends BaseUI {
 
     public MenuPrincipal() {
         super("Menú Principal - TP Reservas");
-        sistema = new Sistema(); // sistema compartido por todas las ventanas
+        try {
+            sistema = new Sistema(); // sistema compartido por todas las ventanas
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         initUI();
         setVisible(true);
     }

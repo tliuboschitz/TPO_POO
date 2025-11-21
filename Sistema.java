@@ -1,7 +1,8 @@
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * Sistema: controlador central
@@ -9,18 +10,28 @@ import java.util.List;
  */
 public class Sistema {
 
-    private List<Cancha> listaCanchas;
-    private List<Reserva> listaReservas;
-    private List<Empleado> listaEmpleados;
-    private List<Alquilador> listaAlquiladores;
-    private List<Audiencia> listaAudiencias;
-    private List<Partido> listaPartidos;
+    static Connection Conection;
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Conection = DriverManager.getConnection("jdbc:sqlite:TPO.db");//Problemas con No suitable driver found for jdbc:sqlite:TPO.db
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    };
+
+    private static List<Cancha> listaCanchas;
+    private static List<Reserva> listaReservas;
+    private static List<Empleado> listaEmpleados;
+    private static List<Alquilador> listaAlquiladores;
+    private static List<Audiencia> listaAudiencias;
+    private static List<Partido> listaPartidos;
     private List<Ticket> listaTickets;
     private List<Mantenimiento> listaMantenimientos;
 
     private int proximoIdPartido = 1; 
 
-    public Sistema() {
+    public Sistema() throws SQLException, ParseException {
         this.listaCanchas = new ArrayList<>();
         this.listaReservas = new ArrayList<>();
         this.listaEmpleados = new ArrayList<>();
@@ -30,15 +41,24 @@ public class Sistema {
         this.listaTickets = new ArrayList<>();
         this.listaMantenimientos = new ArrayList<>();
 
-        // Carga inicial de canchas de ejemplo
-        Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0);
-        Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);
-        Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);
-        Cancha c4 = new Cancha("Cancha 4 (F5)", "F5", 5000.0);
-        listaCanchas.add(c1);
-        listaCanchas.add(c2);
-        listaCanchas.add(c3);
-        listaCanchas.add(c4);
+        SQLAlquilador.SQLProcessing(listaAlquiladores);
+        SQLEmpleado.SQLProcessing(listaEmpleados);
+        SQLAudiencia.SQLProcessing(listaAudiencias);
+        SQLCancha.SQLProcessing(listaCanchas);
+        SQLReserva.SQLProcessing(listaReservas);
+        SQLPartidos.SQLProcessing(listaPartidos);
+        SQLTicket.SQLProcessing(listaTickets);
+        SQLMantenimiento.SQLProcessing(listaMantenimientos);
+
+    }
+
+    public static Audiencia buscarAudienciaPorId(int idAudiencia) {
+        for (Audiencia audiencia : listaAudiencias) {
+            if(audiencia.getDni() == idAudiencia) {
+                return audiencia;
+            }
+        }
+        return  null;
     }
 
     // --- REGISTROS ---
@@ -96,6 +116,15 @@ public class Sistema {
         return false;
     }
 
+    public static Empleado buscarEmpleadoPorId(int idEmpleado) {
+        for (Empleado empleado : listaEmpleados) {
+            if(empleado.getDni() == idEmpleado) {
+                return empleado;
+            }
+        }
+        return null;
+    }
+
     public Comprobante confirmarReserva(int idReserva) {
         Reserva r = buscarReservaPorId(idReserva);
         if (r.getEstado().equals("Confirmada"))
@@ -104,14 +133,23 @@ public class Sistema {
         return r.generarComprobante();
     }
 
-    public Reserva buscarReservaPorId(int id) {
+    public static Alquilador buscarAlquiladorbyId(int idPersona) {
+        for (Alquilador c : listaAlquiladores) {
+            if (c.getDni() == idPersona) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public static Reserva buscarReservaPorId(int id) {
         for (Reserva r : listaReservas)
             if (r.getIdReserva() == id) return r;
 
         throw new IllegalStateException("Reserva no encontrada (id=" + id + ").");
     }
 
-    public Cancha buscarCanchaPorId(int idCancha) {
+    public static Cancha buscarCanchaPorId(int idCancha) {
         for (Cancha c : listaCanchas)
             if (c.getIdCancha() == idCancha) return c;
         throw new IllegalStateException("No se encontró cancha con ID " + idCancha);
@@ -155,7 +193,7 @@ public class Sistema {
         return p;
     }
 
-    public Partido buscarPartidoPorId(int idPartido) {
+    public static Partido buscarPartidoPorId(int idPartido) {
         for (Partido p : listaPartidos)
             if (p.getIdPartido() == idPartido) return p;
         throw new IllegalStateException("Partido no encontrado (id=" + idPartido + ").");
@@ -212,14 +250,14 @@ public class Sistema {
             throw new IllegalArgumentException("Partido o comprador nulo.");
 
         // --- VALIDACIÓN 1: menor sin tutor ---
-        if (comprador.getEdad() < 18 && (comprador.getTutorNombre() == null || comprador.getTutorNombre().isEmpty())) {
+        if (comprador.getEdad() < 18 && (comprador.getTutorNombre() == -1 )) {
             throw new MenorSinTutorException("El comprador es menor y no tiene tutor registrado.");
         }
 
         // --- VALIDACIÓN 2: ticket duplicado (mismo partido + mismo DNI) ---
         for (Ticket t : listaTickets) {
             if (t.getPartido().getIdPartido() == partido.getIdPartido() &&
-                    t.getComprador().getDni().equals(comprador.getDni())) {
+                    Objects.equals(t.getComprador().getDni(), comprador.getDni())) {
                 throw new TicketDuplicadoException("El comprador ya tiene un ticket para este partido.");
             }
         }
@@ -227,6 +265,8 @@ public class Sistema {
         if (partido.estaLleno()) {
             throw new IllegalStateException("El partido ya vendió todas sus entradas.");
         }
+
+
 
         double precioFinal = partido.calcularPrecioFinal(comprador);
         Ticket t = new Ticket(partido, comprador, precioFinal);
@@ -243,6 +283,7 @@ public class Sistema {
         for (Ticket t : listaTickets) total += t.getPrecioPagado();
         return total;
     }
+    
 
     // Getters para UI y pruebas
     public List<Cancha> getListaCanchas() { return new ArrayList<>(listaCanchas); }
@@ -259,7 +300,7 @@ public class Sistema {
         Iterator<Audiencia> it = listaAudiencias.iterator();
         while (it.hasNext()) {
             Audiencia a = it.next();
-            if (a.getDni().equals(dni)) {
+            if (Objects.equals(a.getDni(), dni)) {
                 it.remove();
                 return true;
             }

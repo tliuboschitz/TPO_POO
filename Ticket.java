@@ -13,6 +13,16 @@ public class Ticket {
         this.precioPagado = precioPagado;
     }
 
+    public Ticket(int idTicket, Partido partido, Audiencia comprador, double precioPagado) {
+        this.idTicket = idTicket;
+        this.partido = partido;
+        this.comprador = comprador;
+        this.precioPagado = precioPagado;
+
+        if (idTicket >= contador)
+            contador = idTicket + 1;   // keep counter correct
+    }
+
     public int getIdTicket() { return idTicket; }
     public Partido getPartido() { return partido; }
     public Audiencia getComprador() { return comprador; }

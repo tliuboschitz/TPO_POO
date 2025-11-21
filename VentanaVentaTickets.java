@@ -33,9 +33,9 @@ public class VentanaVentaTickets extends BaseUI {
             try {
                 Partido partido = (Partido) comboPartidos.getSelectedItem();
                 if (partido == null) { showMsg(this, "Seleccione un partido."); return; }
-                String nombre = txtNombre.getText().trim(); String apellido = txtApellido.getText().trim(); String dni = txtDni.getText().trim();
+                String nombre = txtNombre.getText().trim(); String apellido = txtApellido.getText().trim(); int dni = Integer.parseInt(txtDni.getText().trim());
                 String email = txtEmail.getText().trim(); int edad = Integer.parseInt(txtEdad.getText().trim()); boolean esSocio = chkSocio.isSelected();
-                String tutor = edad < 18 ? txtTutor.getText().trim() : null;
+                int tutor = edad < 18 ? Integer.parseInt(txtTutor.getText().trim()) : -1;
                 // Validacion email simple
                 if (!email.matches("^\\S+@\\S+\\.\\S+$")) { showMsg(this, "Email inválido."); return; }
                 Audiencia a = new Audiencia(nombre, apellido, dni, email, edad, esSocio, tutor);

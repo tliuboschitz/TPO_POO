@@ -2,7 +2,7 @@
  * Encargado: tipo de empleado que puede asignar tareas a otros empleados.
  */
 public class Encargado extends Empleado {
-    public Encargado(String nombre, String apellido, String dni) {
+    public Encargado(String nombre, String apellido, int dni) {
         super(nombre, apellido, dni, "Encargado");
     }
 

@@ -12,7 +12,7 @@ public class Empleado extends Persona {
     private List<Partido> partidosACargo;
     private static int proximoId = 1;
 
-    public Empleado(String nombre, String apellido, String dni, String rol) {
+    public Empleado(String nombre, String apellido, int dni, String rol) {
         super(nombre, apellido, dni);
         this.rol = rol;
         this.idEmpleado = proximoId++;

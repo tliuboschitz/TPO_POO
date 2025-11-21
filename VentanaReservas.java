@@ -41,7 +41,7 @@ public class VentanaReservas extends BaseUI {
                 if (cancha == null) { showMsg(this, "Seleccione una cancha."); return; }
                 String hora = txtHora.getText().trim();
                 Date fecha = new Date();
-                Alquilador demo = new Alquilador("Demo","Cliente","000");
+                Alquilador demo = new Alquilador("Demo","Cliente",000);
                 sistema.registrarAlquilador(demo);
                 Reserva r = sistema.crearReserva(demo, cancha, fecha, hora);
                 showMsg(this, "Reserva creada: " + r);

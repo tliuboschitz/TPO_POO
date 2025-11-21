@@ -1,6 +1,7 @@
 // VentanaAudiencia.java
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.List;
 
 public class VentanaAudiencia extends BaseUI {
@@ -38,17 +39,19 @@ public class VentanaAudiencia extends BaseUI {
         btnAlta.addActionListener(e -> {
             try {
                 String nombre = txtNombre.getText().trim(); String apellido = txtApellido.getText().trim();
-                String dni = txtDni.getText().trim(); String email = txtEmail.getText().trim();
+                int dni = Integer.parseInt(txtDni.getText().trim()); String email = txtEmail.getText().trim();
                 int edad = Integer.parseInt(txtEdad.getText().trim()); boolean esSocio = chkSocio.isSelected();
-                String tutor = edad < 18 ? txtTutor.getText().trim() : null;
-                if (nombre.isEmpty() || apellido.isEmpty() || dni.isEmpty()) { showMsg(this, "Complete nombre, apellido y dni."); return; }
+                int tutor = edad < 18 ? Integer.parseInt(txtTutor.getText().trim()) : -1;
+                if (nombre.isEmpty() || apellido.isEmpty() || dni == -1) { showMsg(this, "Complete nombre, apellido y dni."); return; }
                 // Validación básica email -> simple regex
                 if (!email.matches("^\\S+@\\S+\\.\\S+$")) { showMsg(this, "Email inválido."); return; }
                 Audiencia a = new Audiencia(nombre, apellido, dni, email, edad, esSocio, tutor);
                 sistema.registrarAudiencia(a);
                 refreshLista();
                 showMsg(this, "Audiencia registrada: " + a);
-            } catch (NumberFormatException ex) { showMsg(this, "Edad inválida."); }
+            } catch (NumberFormatException ex) { showMsg(this, "Edad inválida."); } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         btnModificar.addActionListener(e -> {
@@ -59,7 +62,7 @@ public class VentanaAudiencia extends BaseUI {
             Audiencia sel = listAud.getSelectedValue(); if (sel == null) { showMsg(this, "Seleccione audiencia."); return; }
             int opt = JOptionPane.showConfirmDialog(this, "Confirmar eliminación de " + sel + " ?", "Eliminar", JOptionPane.YES_NO_OPTION);
             if (opt != JOptionPane.YES_OPTION) return;
-            boolean ok = sistema.eliminarAudienciaPorDni(sel.getDni());
+            boolean ok = sistema.eliminarAudienciaPorDni(String.valueOf(sel.getDni()));
             if (ok) { showMsg(this, "Audiencia eliminada."); refreshLista(); } else showMsg(this, "No se pudo eliminar.");
         });
 

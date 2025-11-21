@@ -36,8 +36,8 @@ public class VentanaEmpleados extends BaseUI {
         content.add(listPanel);
 
         btnAlta.addActionListener(e -> {
-            String nombre = txtNombre.getText().trim(); String apellido = txtApellido.getText().trim(); String dni = txtDni.getText().trim(); String rol = txtRol.getText().trim();
-            if (nombre.isEmpty() || apellido.isEmpty() || dni.isEmpty()) { showMsg(this, "Complete nombre, apellido y dni."); return; }
+            String nombre = txtNombre.getText().trim(); String apellido = txtApellido.getText().trim(); int dni = Integer.parseInt(txtDni.getText().trim()); String rol = txtRol.getText().trim();
+            if (nombre.isEmpty() || apellido.isEmpty() || dni == -1) { showMsg(this, "Complete nombre, apellido y dni."); return; }
             Empleado emp = new Empleado(nombre, apellido, dni, rol); sistema.registrarEmpleado(emp); refreshLista(); showMsg(this, "Empleado registrado: " + emp);
             txtNombre.setText(""); txtApellido.setText(""); txtDni.setText("");
         });

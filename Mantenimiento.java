@@ -1,4 +1,5 @@
 // Mantenimiento.java
+import java.sql.SQLException;
 import java.util.Date;
 public class Mantenimiento {
     private static int proximoId = 1;
@@ -21,6 +22,16 @@ public class Mantenimiento {
         this.canchaAfectada = cancha;
         this.fecha = fecha;
         this.estado = "Pendiente";
+    }
+
+    public Mantenimiento(String descripcion, Cancha cancha, int idMantenimiento) throws SQLException {
+        this.idMantenimiento = idMantenimiento;
+        this.descripcion = descripcion;
+        this.canchaAfectada = cancha;
+        this.estado = "Pendiente";
+        if (idMantenimiento >= proximoId)
+            proximoId = idMantenimiento + 1;
+        SQLMantenimiento.addTablaM(idMantenimiento, descripcion, String.valueOf(cancha.getIdCancha()), estado);
     }
 
     public int getIdMantenimiento() { return idMantenimiento; }
