@@ -1,15 +1,12 @@
+// Mantenimiento.java
 import java.util.Date;
-/**
- * Mantenimiento: tarea sobre una cancha (pendiente/terminado).
- * Se puede marcar como terminado y entonces la cancha vuelve a disponible.
- */
 public class Mantenimiento {
     private static int proximoId = 1;
     private int idMantenimiento;
     private String descripcion;
     private Cancha canchaAfectada;
-    private Date fecha; // Fecha del bloqueo
-    private String estado; // "Pendiente", "En Curso", "Finalizado"
+    private Date fecha;
+    private String estado;
 
     public Mantenimiento(String descripcion, Cancha cancha) {
         this.idMantenimiento = proximoId++;
@@ -26,7 +23,6 @@ public class Mantenimiento {
         this.estado = "Pendiente";
     }
 
-    // Getters y Setters
     public int getIdMantenimiento() { return idMantenimiento; }
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
@@ -35,18 +31,13 @@ public class Mantenimiento {
     public Date getFecha() { return fecha; }
     public String getEstado() { return estado; }
 
-    // Marca la tarea como terminada y vuelve a poner la cancha "Disponible"
     public void marcarComoTerminado() {
         this.estado = "Terminado";
         if (canchaAfectada != null) canchaAfectada.setEstado("Disponible");
     }
 
-    // Método para cerrar el mantenimiento (manual)
-    public void finalizar() {
-        this.estado = "Finalizado";
-    }
+    public void finalizar() { this.estado = "Finalizado"; }
+
     @Override
-    public String toString() {
-        return "Mantenimiento#" + idMantenimiento + " - " + descripcion + " - " + estado;
-    }
+    public String toString() { return "Mantenimiento#" + idMantenimiento + " - " + descripcion + " - " + estado; }
 }

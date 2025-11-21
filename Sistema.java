@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class Sistema {
     private List<Ticket> listaTickets;
     private List<Mantenimiento> listaMantenimientos;
 
-    private int proximoIdPartido = 1; // id secuencial para partidos
+    private int proximoIdPartido = 1; 
 
     public Sistema() {
         this.listaCanchas = new ArrayList<>();
@@ -44,7 +45,19 @@ public class Sistema {
     public void registrarCancha(Cancha c) { if (c!=null) listaCanchas.add(c); }
     public void registrarEmpleado(Empleado e) { if (e!=null) listaEmpleados.add(e); }
     public void registrarAlquilador(Alquilador a) { if (a!=null) listaAlquiladores.add(a); }
-    public void registrarAudiencia(Audiencia a) { if (a!=null) listaAudiencias.add(a); }
+
+    // --- MODIFICACIÓN SOLICITADA POR TU COMPAÑERO ---
+    public void registrarAudiencia(Audiencia a) { 
+        if (a == null) return;
+        
+        // Validación de edad (0 a 100 años)
+        if (a.getEdad() < 0 || a.getEdad() > 100) {
+            throw new IllegalArgumentException("Edad inválida: debe estar entre 0 y 100 años.");
+        }
+        
+        listaAudiencias.add(a); 
+    }
+    // -----------------------------------------------
 
     // --- RESERVAS ---
     public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora)
@@ -105,11 +118,8 @@ public class Sistema {
     }
 
     public boolean estaDisponible(Cancha cancha, Date fecha, String hora) {
-
         if (this.estaEnMantenimiento(cancha, fecha)) return false;
-
         if (this.tieneReserva(cancha, fecha, hora)) return false;
-
         return true;
     }
 
@@ -143,6 +153,33 @@ public class Sistema {
         Partido p = new Partido(reserva, equipos, precioTicketBase, capacidadMaximaTickets);
         listaPartidos.add(p);
         return p;
+    }
+
+    public Partido buscarPartidoPorId(int idPartido) {
+        for (Partido p : listaPartidos)
+            if (p.getIdPartido() == idPartido) return p;
+        throw new IllegalStateException("Partido no encontrado (id=" + idPartido + ").");
+    }
+
+    public boolean eliminarPartido(int idPartido) {
+        // 1) Eliminar tickets asociados
+        Iterator<Ticket> it = listaTickets.iterator();
+        while (it.hasNext()) {
+            Ticket t = it.next();
+            if (t.getPartido().getIdPartido() == idPartido) {
+                it.remove();
+            }
+        }
+        // 2) Eliminar partido
+        Iterator<Partido> itp = listaPartidos.iterator();
+        while (itp.hasNext()) {
+            Partido p = itp.next();
+            if (p.getIdPartido() == idPartido) {
+                itp.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Partido> getListaPartidos() { return new ArrayList<>(listaPartidos); }
@@ -179,7 +216,7 @@ public class Sistema {
             throw new MenorSinTutorException("El comprador es menor y no tiene tutor registrado.");
         }
 
-        // --- VALIDACIÓN 2: ticket duplicado ---
+        // --- VALIDACIÓN 2: ticket duplicado (mismo partido + mismo DNI) ---
         for (Ticket t : listaTickets) {
             if (t.getPartido().getIdPartido() == partido.getIdPartido() &&
                     t.getComprador().getDni().equals(comprador.getDni())) {
@@ -193,7 +230,11 @@ public class Sistema {
 
         double precioFinal = partido.calcularPrecioFinal(comprador);
         Ticket t = new Ticket(partido, comprador, precioFinal);
+
+        // Guardar en listas globales y en el propio Partido
         listaTickets.add(t);
+        partido.agregarTicket(t);
+
         return t;
     }
 
@@ -203,8 +244,50 @@ public class Sistema {
         return total;
     }
 
+    // Getters para UI y pruebas
     public List<Cancha> getListaCanchas() { return new ArrayList<>(listaCanchas); }
     public List<Reserva> getListaReservas() { return new ArrayList<>(listaReservas); }
     public List<Ticket> getListaTickets() { return new ArrayList<>(listaTickets); }
     public List<Audiencia> getListaAudiencias() { return new ArrayList<>(listaAudiencias); }
+    public List<Empleado> getListaEmpleados() { return new ArrayList<>(listaEmpleados); }
+
+    // ============================================================
+    //  MÉTODOS DE ELIMINACIÓN (Corregidos anteriormente)
+    // ============================================================
+
+    public boolean eliminarAudienciaPorDni(String dni) {
+        Iterator<Audiencia> it = listaAudiencias.iterator();
+        while (it.hasNext()) {
+            Audiencia a = it.next();
+            if (a.getDni().equals(dni)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean eliminarCancha(int idCancha) {
+        Iterator<Cancha> it = listaCanchas.iterator();
+        while (it.hasNext()) {
+            Cancha c = it.next();
+            if (c.getIdCancha() == idCancha) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean eliminarEmpleado(int idEmpleado) {
+        Iterator<Empleado> it = listaEmpleados.iterator();
+        while (it.hasNext()) {
+            Empleado e = it.next();
+            if (e.getIdEmpleado() == idEmpleado) { 
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
 }

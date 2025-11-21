@@ -1,3 +1,4 @@
+// Cancha.java
 /**
  * Cancha: representa a la cancha física
  * Tiene ID autoincremental, nombre, tipo, precio por hora y estado.
@@ -24,6 +25,11 @@ public class Cancha {
     public double getPrecioHora() { return precioHora; }
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    // ----- Setters adicionales (solicitados para permitir modificaciones desde UI) -----
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+    public void setPrecioHora(double precioHora) { this.precioHora = precioHora; }
 
     @Override
     public String toString() {

@@ -1,14 +1,13 @@
+// Empleado.java
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Empleado: trabajador del complejo.
- * Tiene rol, UUID y listas de tareas/partidos.
  */
-class Empleado extends Persona {
+public class Empleado extends Persona {
     private String rol;
-    private int idEmpleado; //cambiar
+    private int idEmpleado;
     private List<Mantenimiento> tareasAsignadas;
     private List<Partido> partidosACargo;
     private static int proximoId = 1;
@@ -17,27 +16,17 @@ class Empleado extends Persona {
         super(nombre, apellido, dni);
         this.rol = rol;
         this.idEmpleado = proximoId++;
-        this.tareasAsignadas = new ArrayList<>(); 
+        this.tareasAsignadas = new ArrayList<>();
         this.partidosACargo = new ArrayList<>();
     }
 
-
-    // Getters
     public int getIdEmpleado() { return idEmpleado; }
     public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
 
-    // Añade una tarea de mantenimiento al empleado
-    public void asignarTarea(Mantenimiento tarea) {
-        if(tarea != null) {
-            this.tareasAsignadas.add(tarea);
-        }
-    }
-
-    // Simula que el empleado gestiona un partido
+    public void asignarTarea(Mantenimiento tarea) { if (tarea != null) this.tareasAsignadas.add(tarea); }
     public void gestionarPartido(Partido partido) {
-        if (partido != null && !partidosACargo.contains(partido)) {
-            partidosACargo.add(partido);
-        }
+        if (partido != null && !partidosACargo.contains(partido)) partidosACargo.add(partido);
         System.out.println("Empleado " + super.toString() + " gestiona partido: " + (partido!=null?partido.getEquipos():"N/A"));
     }
 
@@ -46,6 +35,6 @@ class Empleado extends Persona {
 
     @Override
     public String toString() {
-        return super.toString() + " - Rol: " + rol;
+        return super.toString() + " - Rol: " + rol + " (ID:" + idEmpleado + ")";
     }
 }

@@ -1,7 +1,4 @@
-/**
- * Persona (abstracta): base para todos los roles humanos del sistema.
- * Contiene nombre, apellido y dni.
- */
+// Persona.java
 public abstract class Persona {
     protected String nombre;
     protected String apellido;
@@ -12,14 +9,10 @@ public abstract class Persona {
         this.apellido = apellido;
         this.dni = dni;
     }
-    // Getters
     public String getNombre() { return nombre; }
     public String getApellido() { return apellido; }
     public String getDni() { return dni; }
-
-    // Método toString() es el estándar en Java para esto
     @Override
-    public String toString() {
-        return apellido + ", " + nombre + " (DNI: " + dni + ")";
-    }
+    public String toString() { return apellido + ", " + nombre + " (DNI: " + dni + ")"; }
+    // Setters si se necesitan (no los agregamos por ahora para respetar modelo)
 }

@@ -1,9 +1,5 @@
+// Reserva.java
 import java.util.Date;
-
-/**
- * Reserva: reserva de cancha por un alquilador en fecha/hora.
- * Estado: Pendiente/Confirmada/Cancelada.
- */
 public class Reserva {
     private static int proximoId = 1;
     private int idReserva;
@@ -34,8 +30,6 @@ public class Reserva {
     public void setEstado(String estado) { this.estado = estado; }
     public void confirmar() { this.estado = "Confirmada"; }
     public void cancelar() { this.estado = "Cancelada"; }
-
-    // Genera comprobante al confirmar
     public Comprobante generarComprobante() { return new Comprobante(this); }
 
     @Override

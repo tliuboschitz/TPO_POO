@@ -1,8 +1,5 @@
+// Comprobante.java
 import java.util.Date;
-
-/**
- * Comprobante: generado al confirmar una reserva.
- */
 public class Comprobante {
     private static int contador = 1;
     private int idComprobante;

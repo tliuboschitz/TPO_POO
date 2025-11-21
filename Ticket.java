@@ -1,4 +1,4 @@
-
+// Ticket.java
 public class Ticket {
     private static int contador = 1;
     private int idTicket;
