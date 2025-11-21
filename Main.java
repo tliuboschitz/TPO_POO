@@ -98,13 +98,16 @@ public class Main extends JFrame {
         for (Cancha c : sistema.getListaCanchas()) comboCanchas.addItem(c);
 
         JTextField txtHora = new JTextField("20:00", 6);
+
         JButton btnCrearReserva = new JButton("Crear Reserva");
         estilizarBoton(btnCrearReserva, new Color(76, 175, 80)); // verde
 
         panel.add(new JLabel("Cancha:"));
         panel.add(comboCanchas);
+
         panel.add(new JLabel("Hora:"));
         panel.add(txtHora);
+
         panel.add(new JLabel(""));
         panel.add(btnCrearReserva);
 
@@ -120,11 +123,17 @@ public class Main extends JFrame {
                     showMsg("⚠️ Ingrese una hora válida.");
                     return;
                 }
+
+                // Demostración
                 Alquilador alquilador = new Alquilador("Demo", "Cliente", "000");
                 sistema.registrarAlquilador(alquilador);
+
                 Reserva r = sistema.crearReserva(alquilador, cancha, new Date(), hora);
                 showMsg("📅 Reserva creada: " + r);
                 refreshReservas();
+
+            } catch (CanchaNoDisponibleException ex) {
+                showMsg("⚠️ " + ex.getMessage());
             } catch (Exception ex) {
                 showMsg("❌ Error creando reserva: " + ex.getMessage());
             }
@@ -144,15 +153,23 @@ public class Main extends JFrame {
 
         JTextField txtEquipos = new JTextField("EquipoA vs EquipoB", 12);
         JTextField txtPrecioTicket = new JTextField("1500", 6);
+        JTextField txtCapacidad = new JTextField("200", 6);
+
         JButton btnCrearPartido = new JButton("Crear Partido");
         estilizarBoton(btnCrearPartido, new Color(33, 150, 243)); // azul
 
         panel.add(new JLabel("Reserva:"));
         panel.add(comboReservas);
+
         panel.add(new JLabel("Equipos:"));
         panel.add(txtEquipos);
+
         panel.add(new JLabel("Precio Ticket:"));
         panel.add(txtPrecioTicket);
+
+        panel.add(new JLabel("Capacidad Máxima:"));
+        panel.add(txtCapacidad);
+
         panel.add(new JLabel(""));
         panel.add(btnCrearPartido);
 
@@ -163,11 +180,16 @@ public class Main extends JFrame {
                     showMsg("⚠️ Seleccione una reserva.");
                     return;
                 }
+
                 String equipos = txtEquipos.getText().trim();
                 double precio = Double.parseDouble(txtPrecioTicket.getText().trim());
-                Partido p = sistema.crearPartido(reserva, equipos, precio);
+                int capacidad = Integer.parseInt(txtCapacidad.getText().trim());
+
+                Partido p = sistema.crearPartido(reserva, equipos, precio, capacidad);
                 showMsg("⚽ Partido creado: " + p);
                 refreshPartidos();
+            } catch (NumberFormatException nfe) {
+                showMsg("⚠️ Valores numéricos inválidos.");
             } catch (Exception ex) {
                 showMsg("❌ Error creando partido: " + ex.getMessage());
             }
@@ -192,6 +214,7 @@ public class Main extends JFrame {
         JTextField txtEdad = new JTextField();
         JCheckBox chkSocio = new JCheckBox("Es socio");
         JTextField txtTutor = new JTextField();
+
         JButton btnVenderTicket = new JButton("Vender Ticket");
         estilizarBoton(btnVenderTicket, new Color(255, 152, 0)); // naranja
 
@@ -220,6 +243,7 @@ public class Main extends JFrame {
                     showMsg("⚠️ Seleccione un partido.");
                     return;
                 }
+
                 String nombre = txtNombre.getText().trim();
                 String apellido = txtApellido.getText().trim();
                 String dni = txtDni.getText().trim();
@@ -230,12 +254,18 @@ public class Main extends JFrame {
 
                 Audiencia a = new Audiencia(nombre, apellido, dni, email, edad, esSocio, tutor);
                 sistema.registrarAudiencia(a);
+
                 Ticket t = sistema.venderTicket(partido, a);
                 showMsg("🎟️ Ticket vendido: " + t);
+
             } catch (NumberFormatException nfe) {
-                showMsg("⚠️ Edad inválida. Venta cancelada.");
+                showMsg("⚠️ Edad inválida.");
+            } catch (MenorSinTutorException ex) {
+                showMsg("❌ Menor sin tutor: " + ex.getMessage());
+            } catch (TicketDuplicadoException ex) {
+                showMsg("❌ Ticket duplicado: " + ex.getMessage());
             } catch (Exception ex) {
-                showMsg("❌ Error en venta: " + ex.getMessage());
+                showMsg("❌ Error: " + ex.getMessage());
             }
         });
 
@@ -255,16 +285,14 @@ public class Main extends JFrame {
     private void refreshReservas() {
         if (comboReservas != null) {
             comboReservas.removeAllItems();
-            List<Reserva> rs = sistema.getListaReservas();
-            for (Reserva r : rs) comboReservas.addItem(r);
+            for (Reserva r : sistema.getListaReservas()) comboReservas.addItem(r);
         }
     }
 
     private void refreshPartidos() {
         if (comboPartidos != null) {
             comboPartidos.removeAllItems();
-            List<Partido> ps = sistema.getListaPartidos();
-            for (Partido p : ps) comboPartidos.addItem(p);
+            for (Partido p : sistema.getListaPartidos()) comboPartidos.addItem(p);
         }
     }
 

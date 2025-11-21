@@ -30,10 +30,10 @@ public class Sistema {
         this.listaMantenimientos = new ArrayList<>();
 
         // Carga inicial de canchas de ejemplo
-        Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0); // ID será 1
-        Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);   // ID será 2
-        Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);   // ID será 3
-        Cancha c4 = new Cancha("Cancha 4 (F5)", "F5", 5000.0);   // ID será 4
+        Cancha c1 = new Cancha("Cancha 1 (F11)", "F11", 10000.0);
+        Cancha c2 = new Cancha("Cancha 2 (F9)", "F9", 8000.0);
+        Cancha c3 = new Cancha("Cancha 3 (F5)", "F5", 5000.0);
+        Cancha c4 = new Cancha("Cancha 4 (F5)", "F5", 5000.0);
         listaCanchas.add(c1);
         listaCanchas.add(c2);
         listaCanchas.add(c3);
@@ -47,105 +47,98 @@ public class Sistema {
     public void registrarAudiencia(Audiencia a) { if (a!=null) listaAudiencias.add(a); }
 
     // --- RESERVAS ---
-    public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora) {
+    public Reserva crearReserva(Alquilador alquilador, Cancha cancha, Date fecha, String hora)
+            throws CanchaNoDisponibleException {
+
         if (alquilador == null) throw new IllegalArgumentException("Alquilador nulo.");
         if (cancha == null) throw new IllegalArgumentException("Cancha nula.");
-        if (!estaDisponible(cancha, fecha, hora)) throw new IllegalStateException("Cancha ocupada en ese horario.");
+
+        if (!estaDisponible(cancha, fecha, hora)) {
+            throw new CanchaNoDisponibleException("La cancha no está disponible en ese horario.");
+        }
+
         Reserva r = new Reserva(fecha, hora, alquilador, cancha);
         listaReservas.add(r);
         return r;
     }
+
     public void cancelarReserva(int idReserva) {
         Reserva r = buscarReservaPorId(idReserva);
-        if (r.getEstado().equals("Cancelada")) throw new IllegalStateException("Reserva ya cancelada.");
+        if (r.getEstado().equals("Cancelada"))
+            throw new IllegalStateException("Reserva ya cancelada.");
         r.cancelar();
     }
+
     private boolean tieneReserva(Cancha cancha, Date fecha, String hora) {
         for (Reserva res : this.listaReservas) {
-            // Coincide Cancha, Fecha y Hora
             if (res.getCancha().getIdCancha() == cancha.getIdCancha() &&
-                esMismoDia(res.getFecha(), fecha) &&
-                res.getHora().equals(hora)) {
-                
-                // Si la reserva NO está cancelada, ocupa lugar
+                    esMismoDia(res.getFecha(), fecha) &&
+                    res.getHora().equals(hora)) {
+
                 if (!res.getEstado().equals("Cancelada")) {
-                    return true; // SÍ, tiene reserva
+                    return true;
                 }
             }
         }
-        return false; // No tiene reserva
-    }  
+        return false;
+    }
+
     public Comprobante confirmarReserva(int idReserva) {
         Reserva r = buscarReservaPorId(idReserva);
-        if (r.getEstado().equals("Confirmada")) throw new IllegalStateException("Reserva ya confirmada.");
+        if (r.getEstado().equals("Confirmada"))
+            throw new IllegalStateException("Reserva ya confirmada.");
         r.confirmar();
-        Comprobante c = r.generarComprobante();
-        return c;
+        return r.generarComprobante();
     }
-    
-    // Busca reserva por id, lanza excepción si no existe
+
     public Reserva buscarReservaPorId(int id) {
-        for (Reserva r : listaReservas) if (r.getIdReserva() == id) return r;
+        for (Reserva r : listaReservas)
+            if (r.getIdReserva() == id) return r;
+
         throw new IllegalStateException("Reserva no encontrada (id=" + id + ").");
     }
-    
-    // Recorre la lista de canchas y devuelve la que coincide con el idCancha
+
     public Cancha buscarCanchaPorId(int idCancha) {
-        for (Cancha c : listaCanchas) {
-            if (c.getIdCancha() == idCancha) {
-                return c;
-            }
-        }
-        throw new IllegalStateException("Error: No se encontró ninguna cancha con el ID " + idCancha);
+        for (Cancha c : listaCanchas)
+            if (c.getIdCancha() == idCancha) return c;
+        throw new IllegalStateException("No se encontró cancha con ID " + idCancha);
     }
 
     public boolean estaDisponible(Cancha cancha, Date fecha, String hora) {
-    
-        // 1. Chequeamos Mantenimiento
-        if (this.estaEnMantenimiento(cancha, fecha)) {
-            System.out.println("Disponibilidad: NO. La cancha está en mantenimiento.");
-            return false;
-        }
 
-        // 2. Chequeamos Reservas
-        if (this.tieneReserva(cancha, fecha, hora)) {
-            System.out.println("Disponibilidad: NO. La cancha ya está reservada.");
-            return false;
-        }
+        if (this.estaEnMantenimiento(cancha, fecha)) return false;
 
-        // 3. Si pasó ambos filtros
-        System.out.println("Disponibilidad: SÍ. Puede reservar.");
+        if (this.tieneReserva(cancha, fecha, hora)) return false;
+
         return true;
     }
-}
 
     public Mantenimiento buscMantenimientoarPorId(int idMantenimiento) {
-        for (Mantenimiento m : listaMantenimientos) {
-            if (m.getIdMantenimiento() == idMantenimiento) {
-                return m;
-            }
-        }
-        throw new IllegalStateException("Error: No se encontró ningún mantenimiento con el ID " + idMantenimiento);
+        for (Mantenimiento m : listaMantenimientos)
+            if (m.getIdMantenimiento() == idMantenimiento) return m;
+
+        throw new IllegalStateException("No se encontró mantenimiento con ID " + idMantenimiento);
     }
+
     public void asignarTareaMantenimiento(Empleado empleado, Mantenimiento tarea) {
         empleado.asignarTarea(tarea);
     }
+
     public Mantenimiento finalizarMantenimiento(int idMantenimiento) {
-        Mantenimiento mantenimiento = this.buscMantenimientoarPorId(idMantenimiento);
-        mantenimiento.finalizar();
-        return mantenimiento;
+        Mantenimiento m = buscMantenimientoarPorId(idMantenimiento);
+        m.finalizar();
+        return m;
     }
+
     public Mantenimiento crearMantenimiento(String descripcion, Cancha cancha, Date fecha) {
-        Mantenimiento nuevoMantenimiento = new Mantenimiento(descripcion, cancha, fecha);
-        this.listaMantenimientos.add(nuevoMantenimiento);
-        return nuevoMantenimiento;
+        Mantenimiento nuevo = new Mantenimiento(descripcion, cancha, fecha);
+        listaMantenimientos.add(nuevo);
+        return nuevo;
     }
-    
-    
+
     // --- PARTIDOS ---
     public Partido crearPartido(Reserva reserva, String equipos, double precioTicketBase, int capacidadMaximaTickets) {
         if (reserva == null) throw new IllegalArgumentException("Reserva nula.");
-        // confirmar automáticamente la reserva si está pendiente
         if (reserva.getEstado().equals("Pendiente")) reserva.confirmar();
         Partido p = new Partido(reserva, equipos, precioTicketBase, capacidadMaximaTickets);
         listaPartidos.add(p);
@@ -157,48 +150,59 @@ public class Sistema {
     public boolean esMismoDia(Date a, Date b) {
         if (a == null || b == null) return false;
         java.util.Calendar ca = java.util.Calendar.getInstance();
-        ca.setTime(a);
         java.util.Calendar cb = java.util.Calendar.getInstance();
+        ca.setTime(a);
         cb.setTime(b);
         return ca.get(java.util.Calendar.YEAR) == cb.get(java.util.Calendar.YEAR)
-            && ca.get(java.util.Calendar.DAY_OF_YEAR) == cb.get(java.util.Calendar.DAY_OF_YEAR);
+                && ca.get(java.util.Calendar.DAY_OF_YEAR) == cb.get(java.util.Calendar.DAY_OF_YEAR);
     }
 
     private boolean estaEnMantenimiento(Cancha cancha, Date fecha) {
-        for (Mantenimiento mant : this.listaMantenimientos) {
-            // Coincide Cancha Y Coincide Fecha
+        for (Mantenimiento mant : listaMantenimientos) {
             if (mant.getCanchaAfectada().getIdCancha() == cancha.getIdCancha() &&
-                esMismoDia(mant.getFecha(), fecha)) {
-                
-                // Si NO está finalizado, entonces está en mantenimiento
-                if (!mant.getEstado().equals("Finalizado")) {
-                    return true; // SÍ, está en mantenimiento
-                }
+                    esMismoDia(mant.getFecha(), fecha)) {
+                if (!mant.getEstado().equals("Finalizado")) return true;
             }
         }
-        return false; // No encontramos nada, no está en mantenimiento
+        return false;
     }
 
     // --- TICKETS ---
-    public Ticket venderTicket(Partido partido, Audiencia comprador) {
-        if (partido == null || comprador == null) throw new IllegalArgumentException("Partido o comprador nulo.");
-        if (partido.estaLleno()) {
-            throw new IllegalStateException("Error al vender el ticket: El partido ya ha vendido todas las entradas disponibles.");
+    public Ticket venderTicket(Partido partido, Audiencia comprador)
+            throws MenorSinTutorException, TicketDuplicadoException {
+
+        if (partido == null || comprador == null)
+            throw new IllegalArgumentException("Partido o comprador nulo.");
+
+        // --- VALIDACIÓN 1: menor sin tutor ---
+        if (comprador.getEdad() < 18 && (comprador.getTutorNombre() == null || comprador.getTutorNombre().isEmpty())) {
+            throw new MenorSinTutorException("El comprador es menor y no tiene tutor registrado.");
         }
+
+        // --- VALIDACIÓN 2: ticket duplicado ---
+        for (Ticket t : listaTickets) {
+            if (t.getPartido().getIdPartido() == partido.getIdPartido() &&
+                    t.getComprador().getDni().equals(comprador.getDni())) {
+                throw new TicketDuplicadoException("El comprador ya tiene un ticket para este partido.");
+            }
+        }
+
+        if (partido.estaLleno()) {
+            throw new IllegalStateException("El partido ya vendió todas sus entradas.");
+        }
+
         double precioFinal = partido.calcularPrecioFinal(comprador);
         Ticket t = new Ticket(partido, comprador, precioFinal);
         listaTickets.add(t);
         return t;
     }
 
-    // Reporte simple de ingresos (suma de todos los tickets vendidos)
     public double generarReporteIngresos() {
         double total = 0.0;
         for (Ticket t : listaTickets) total += t.getPrecioPagado();
         return total;
     }
 
-    // Getters para UI y pruebas
     public List<Cancha> getListaCanchas() { return new ArrayList<>(listaCanchas); }
     public List<Reserva> getListaReservas() { return new ArrayList<>(listaReservas); }
     public List<Ticket> getListaTickets() { return new ArrayList<>(listaTickets); }
