@@ -1,0 +1,26 @@
+// Ticket.java
+public class Ticket {
+    private static int contador = 1;
+    private int idTicket;
+    private Partido partido;
+    private Audiencia comprador;
+    private double precioPagado;
+
+    public Ticket(Partido partido, Audiencia comprador, double precioPagado) {
+        this.idTicket = contador++;
+        this.partido = partido;
+        this.comprador = comprador;
+        this.precioPagado = precioPagado;
+    }
+
+    public int getIdTicket() { return idTicket; }
+    public Partido getPartido() { return partido; }
+    public Audiencia getComprador() { return comprador; }
+    public double getPrecioPagado() { return precioPagado; }
+
+    @Override
+    public String toString() {
+        return "Ticket#" + idTicket + " - Partido: " + (partido!=null?partido.getEquipos():"N/A")
+                + " - Comprador: " + (comprador!=null?comprador.getNombre():"N/A") + " - $" + precioPagado;
+    }
+}
