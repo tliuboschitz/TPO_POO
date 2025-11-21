@@ -45,9 +45,6 @@ public abstract class Persona {
             }
         }
 
-
-
-    // Método toString() es el estándar en Java para esto
         @Override
         public String toString() {
 
