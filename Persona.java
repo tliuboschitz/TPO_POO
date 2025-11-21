@@ -12,11 +12,12 @@ public abstract class Persona {
         this.apellido = apellido;
         this.dni = dni;
     }
-
+    // Getters
     public String getNombre() { return nombre; }
     public String getApellido() { return apellido; }
     public String getDni() { return dni; }
 
+    // Método toString() es el estándar en Java para esto
     @Override
     public String toString() {
         return apellido + ", " + nombre + " (DNI: " + dni + ")";

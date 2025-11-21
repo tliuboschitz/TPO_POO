@@ -6,9 +6,9 @@ public class Cancha {
     private static int proximoId = 1;
     private int idCancha;
     private String nombre;
-    private String tipo;
+    private String tipo; // "F11", "F9", "F5"
     private double precioHora;
-    private String estado;
+    private String estado;// "Disponible", "En Mantenimiento", "Reservada"
 
     public Cancha(String nombre, String tipo, double precioHora) {
         this.idCancha = proximoId++;

@@ -31,7 +31,7 @@ public class Reserva {
     public Cancha getCancha() { return cancha; }
     public double getMonto() { return monto; }
     public String getEstado() { return estado; }
-
+    public void setEstado(String estado) { this.estado = estado; }
     public void confirmar() { this.estado = "Confirmada"; }
     public void cancelar() { this.estado = "Cancelada"; }
 
