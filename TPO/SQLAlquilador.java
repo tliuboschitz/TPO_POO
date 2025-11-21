@@ -24,9 +24,9 @@ public class SQLAlquilador{
         try{
             String query = "INSERT or IGNORE INTO ALQUILADOR(dniAl) VALUES (?)";
             PreparedStatement stmt = Sistema.Conection.prepareStatement(query);
-            stmt.setInt(1, dni);  // dni is passed as an integer
+            stmt.setInt(1, dni);
             stmt.executeUpdate();
-            stmt.close();
+            stmt.close(); //Se asegura de cerrar la conexion
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -7,13 +7,13 @@ import java.sql.Statement;
 import java.util.List;
 
 public class SQLPersona {
-
+//  Si en caso de que no exista una tabla de Mantenimiento, se la creara
     private SQLPersona() throws SQLException {
         Statement stmt = Sistema.Conection.createStatement();
         stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PERSONA(nombre TEXT, apellido TEXT, dni INTEGER PRIMARY KEY NOT NULL)");
         stmt.close();
     }
-
+    // Eso permite conectar con las tablas del base de dato, asi adjuntando los datos en la lista de los objetos.
     protected void SQLProcessing(List<Persona> listaPersonas) throws SQLException {
         Statement stmt = Sistema.Conection.createStatement();
         ResultSet resultSet1 = stmt.executeQuery("SELECT nombre, apellido, dni FROM PERSONA");
@@ -26,7 +26,7 @@ public class SQLPersona {
         }
         stmt.close();
     }
-
+    // Eso permite conectar con las tablas del base de dato, asi adjuntando los datos en la lista de los objetos.
     protected static void addTableP(String nombre, String apellido, int dni) throws SQLException {
         try {
             String query = "INSERT or IGNORE INTO PERSONA(nombre, apellido, dni) VALUES (?, ?, ?)";
